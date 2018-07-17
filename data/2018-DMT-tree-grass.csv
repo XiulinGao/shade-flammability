@@ -1,0 +1,642 @@
+site,sample point,location,quadrat ID,type,code,dbh,cover rate
+RHL,1,,,tree,PICE,27.9,
+RHL,1,under,under-1,grass,BOGR,,10%
+RHL,1,under,under-1,grass,ERLE,,20%
+RHL,1,under,under-1,grass,PIFI,,75%
+RHL,1,under,under-1,grass,MUBIG,,10%
+RHL,1,under,under-1,ground,BG,,10%
+RHL,1,under,under-2,grass,PIFI,,65%
+RHL,1,under,under-2,ground,BG,,35%
+RHL,1,under,under-3,grass,SCSC,,35%
+RHL,1,under,under-3,grass,PIFI,,15%
+RHL,1,under,under-3,grass,MUBIG,,25%
+RHL,1,under,under-3,ground,BG,,50%
+RHL,1,open,open-1,grass,ERLE,,80%
+RHL,1,open,open-1,grass,MUSPIKE,,10%
+RHL,1,open,open-1,ground,BG,,20%
+RHL,1,open,open-2,grass,ANGE,,30%
+RHL,1,open,open-2,grass,ERLE,,40%
+RHL,1,open,open-2,grass,BOGR,,15%
+RHL,1,open,open-2,ground,BG,,25%
+RHL,1,open,open-3,grass,ANGE,,25%
+RHL,1,open,open-3,grass,ERLE,,20%
+RHL,1,open,open-3,grass,BOGR,,35%
+RHL,1,open,open-3,ground,BG,,25%
+RHL,2,,,tree,QUGR3,22.8,
+RHL,2,,,tree,QUGR3,20.6,
+RHL,2,,,tree,QUGR3,24.4,
+RHL,2,under,under-1,grass,PIFI,,70%
+RHL,2,under,under-1,ground,BG,,30%
+RHL,2,under,under-2,grass,PIFI,,45%
+RHL,2,under,under-2,ground,BG,,55%
+RHL,2,under,under-3,grass,PIFI,,40%
+RHL,2,under,under-3,ground,BG,,60%
+RHL,2,open,open-1,herb,ACAN,,35%
+RHL,2,open,open-1,grass,ANGE,,5%
+RHL,2,open,open-1,grass,ERLE,,35%
+RHL,2,open,open-1,grass,MUBIG,,20%
+RHL,2,open,open-1,grass,BOGR,,10%
+RHL,2,open,open-1,ground,BG,,20%
+RHL,2,open,open-2,grass,"Aristida ""FS""",,30%
+RHL,2,open,open-2,grass,SCSC,,15%
+RHL,2,open,open-2,grass,MUSPIKE,,10%
+RHL,2,open,open-2,grass,BOGR,,25%
+RHL,2,open,open-2,grass,MUBIG,,10%
+RHL,2,open,open-2,ground,BG,,20%
+RHL,2,open,open-3,grass,BOGCU,,35%
+RHL,2,open,open-3,grass,ERLE,,20%
+RHL,2,open,open-3,grass,"Aristida ""FS""",,5%
+RHL,2,open,open-3,ground,BG,,45%
+RHL,3,,,tree,PICE,25.3,
+RHL,3,,,tree,QUGR3,36.9,
+RHL,3,,,tree,PICE,24.8,
+RHL,3,,,tree,QUEM,32.6,
+RHL,3,under,under-1,grass,PIFI,,35%
+RHL,3,under,under-1,grass,BOCU,,5%
+RHL,3,under,under-1,ground,BG,,60%
+RHL,3,under,under-2,grass,PIFI,,45%
+RHL,3,under,under-2,ground,BG,,55%
+RHL,3,under,under-3,grass,PIFI,,60%
+RHL,3,under,under-3,ground,BG,,40%
+RHL,3,open,open-1,grass,PAHA/PAVI?,,90%
+RHL,3,open,open-1,grass,Setaria,,25%
+RHL,3,open,open-1,ground,BG,,10%
+RHL,3,open,open-2,grass,SCSC,,60%
+RHL,3,open,open-2,grass,MUBIG,,20%
+RHL,3,open,open-2,ground,BG,,20%
+RHL,3,open,open-3,grass,MUBIG,,45%
+RHL,3,open,open-3,grass,BOGR,,30%
+RHL,3,open,open-3,ground,BG,,30%
+RHL,4,,,tree,QUGR3,34.6,
+RHL,4,under,under-1,grass,ANGE,,5%
+RHL,4,under,under-1,grass,LEDU,,5%
+RHL,4,under,under-1,grass,BOGR,,15%
+RHL,4,under,under-1,grass,PAHA,,40%
+RHL,4,under,under-1,ground,BG,,35%
+RHL,4,under,under-2,grass,PIFI,,25%
+RHL,4,under,under-2,grass,BOGR,,5%
+RHL,4,under,under-2,grass,ANGE,,15%
+RHL,4,under,under-2,tree sapling,JUDE2,,1%
+RHL,4,under,under-2,herb,ACAN,,5%
+RHL,4,under,under-2,grass,PAHA,,5%
+RHL,4,under,under-2,ground,BG,,55%
+RHL,4,under,under-3,grass,ANGE,,15%
+RHL,4,under,under-3,grass,BOGR,,15%
+RHL,4,under,under-3,grass,MUBIG,,25%
+RHL,4,under,under-3,grass,PAHA,,30%
+RHL,4,under,under-3,ground,BG,,45%
+RHL,4,open,open-1,grass,BOGR,,45%
+RHL,4,open,open-1,grass,MUBIG,,40%
+RHL,4,open,open-1,grass,SCSC,,30%
+RHL,4,open,open-2,grass,BOGR,,35%
+RHL,4,open,open-2,grass,SCSC,,30%
+RHL,4,open,open-2,grass,"Aristida ""FS""",,20%
+RHL,4,open,open-2,grass,MUBIG,,5%
+RHL,4,open,open-2,ground,BG,,20%
+RHL,4,open,open-3,grass,MUBIG,,30%
+RHL,4,open,open-3,grass,MUSPIKE,,10%
+RHL,4,open,open-3,grass,BOGR,,20%
+RHL,4,open,open-3,grass,ERLE,,25%
+RHL,4,open,open-3,ground,BG,,30%
+RHL,5,,,tree,QUGR3,23.5,
+RHL,5,,,tree,QUGR3,21.4,
+RHL,5,,,tree,PICE,4.3,
+RHL,5,,,tree,PICE,1,
+RHL,5,under,under-1,grass,PIFI,,45%
+RHL,5,under,under-1,grass,SC unkown,,25%
+RHL,5,under,under-1,ground,BG,,50%
+RHL,5,under,under-2,grass,PIFI,,40%
+RHL,5,under,under-2,grass,MU unkown,,10%
+RHL,5,under,under-2,ground,BG,,50%
+RHL,5,under,under-3,herb,ACAN,,20%
+RHL,5,under,under-3,grass,PIFI,,35%
+RHL,5,under,under-3,grass,SC unkown,,25%
+RHL,5,under,under-3,grass,BOGR,,5%
+RHL,5,under,under-3,ground,BG,,25%
+RHL,5,open,open-1,grass,"Aristida ""curly""",,15%
+RHL,5,open,open-1,grass,ERLE,,30%
+RHL,5,open,open-1,grass,BOGR,,20%
+RHL,5,open,open-1,grass,MUBIG,,15%
+RHL,5,open,open-1,grass,SCSC,,25%
+RHL,5,open,open-1,ground,BG,,25%
+RHL,5,open,open-2,grass,"Aristida ""curly""",,20%
+RHL,5,open,open-2,grass,BOGR,,20%
+RHL,5,open,open-2,grass,ERLE,,25%
+RHL,5,open,open-2,grass,SCSC,,25%
+RHL,5,open,open-2,ground,BG,,30%
+RHL,5,open,open-3,grass,MUBIG,,35%
+RHL,5,open,open-3,grass,ERLE,,20%
+RHL,5,open,open-3,grass,BOGR,,35%
+RHL,5,open,open-3,ground,BG,,30%
+RHL,6,,,tree,PICE,18.2,
+RHL,6,,,,PICE,18.2,
+RHL,6,,,,PICE,12.7,
+RHL,6,under,under-1,grass,PIFI,,85%
+RHL,6,under,under-1,grass,PAHA,,10%
+RHL,6,under,under-1,ground,BG,,15%
+RHL,6,under,under-2,grass,PIFI,,90%
+RHL,6,under,under-2,grass,SCSC,,10%
+RHL,6,under,under-2,ground,BG,,10%
+RHL,6,under,under-3,grass,PIFI,,20%
+RHL,6,under,under-3,grass,SCSC,,35%
+RHL,6,under,under-3,ground,BG,,10%
+RHL,6,open,open-1,grass,BOGR,,35%
+RHL,6,open,open-1,grass,MUBIG,,30%
+RHL,6,open,open-1,grass,PAHA,,5%
+RHL,6,open,open-1,ground,BG,,30%
+RHL,6,open,open-2,tree sapling,JUDE2,,25%
+RHL,6,open,open-2,grass,ERLE,,20%
+RHL,6,open,open-2,grass,MUBIG,,30%
+RHL,6,open,open-2,grass,ANGE,,30%
+RHL,6,open,open-2,grass,BOGR,,10%
+RHL,6,open,open-2,ground,BG,,10%
+RHL,6,open,open-3,grass,BOHI,,95%
+RHL,6,open,open-3,forb,forbes,,1%
+RHL,6,open,open-3,grass,ERLE,,5%
+RHL,6,open,open-3,ground,BG,,5%
+RHL,7,,,tree,QUGR3,18.4,
+RHL,7,,,tree,QUGR3,20.9,
+RHL,7,,,tree,PICE,17.9,
+RHL,7,under,under-1,grass,PIFI,,50%
+RHL,7,under,under-1,ground,BG,,50%
+RHL,7,under,under-2,grass,PIFI,,70%
+RHL,7,under,under-2,ground,BG,,30%
+RHL,7,under,under-3,grass,PIFI,,25%
+RHL,7,under,under-3,grass,MUBIG,,35%
+RHL,7,under,under-3,ground,BG,,40%
+RHL,7,open,open-1,grass,BOGR,,80%
+RHL,7,open,open-1,ground,BG,,20%
+RHL,7,open,open-2,grass,ANGE,,25%
+RHL,7,open,open-2,grass,"Aristida ""FS""",,10%
+RHL,7,open,open-2,grass,MUSPIKE,,5%
+RHL,7,open,open-2,grass,BOHI,,20%
+RHL,7,open,open-2,ground,BG,,40%
+RHL,7,open,open-3,grass,BOGR,,30%
+RHL,7,open,open-3,grass,MUBIG,,20%
+RHL,7,open,open-3,grass,ERLE,,20%
+RHL,7,open,open-3,ground,BG,,45%
+RHL,8,,,tree,JUDE2,30,
+RHL,8,,,tree,JUDE2,16,
+RHL,8,,,tree,JUDE2,26,
+RHL,8,,,tree,JUDE2,15.5,
+RHL,8,,,tree,JUDE2,22.4,
+RHL,8,under,under-1,grass,PIFI,,85%
+RHL,8,under,under-1,grass,SCSC,,10%
+RHL,8,under,under-1,ground,BG,,15%
+RHL,8,under,under-2,grass,PIFI,,80%
+RHL,8,under,under-2,grass,ANGE,,20%
+RHL,8,under,under-2,grass,BG,,10%
+RHL,8,under,under-3,grass,PIFI,,75%
+RHL,8,under,under-3,grass,ANGE,,25%
+RHL,8,under,under-3,grass,SCSC,,20%
+RHL,8,under,under-3,ground,BG,,5%
+RHL,8,open,open-1,grass,BOGR,,10%
+RHL,8,open,open-1,grass,ERLE,,25%
+RHL,8,open,open-1,ground,BG,,15%
+RHL,8,open,open-1,grass,"Aristida ""FS""",,5%
+RHL,8,open,open-1,grass,BOHI,,65%
+RHL,8,open,open-2,grass,BOGR,,15%
+RHL,8,open,open-2,grass,BOHI,,75%
+RHL,8,open,open-2,grass,"Aristida ""FS""",,7%
+RHL,8,open,open-2,ground,BG,,15%
+RHL,8,open,open-3,grass,ERLE,,10%
+RHL,8,open,open-3,grass,BOGR,,10%
+RHL,8,open,open-3,grass,MUSPIKE,,85%
+RHL,8,open,open-3,grass,ANGE,,15%
+RHL,8,open,open-3,ground,BG,,3%
+STK,1,,,tree,JUDE2,64,
+STK,1,,,tree,JUDE2,57.4,
+STK,1,under,under-1,grass,Hesperostipa,,100%
+STK,1,under,under-1,grass,Festuca,,10%
+STK,1,under,under-2,grass,Hesperostipa,,85%
+STK,1,under,under-2,grass,Setaria,,5%
+STK,1,under,under-3,grass,SCSC,,1%
+STK,1,under,under-3,forb,forb,,5%
+STK,1,under,under-3,grass,Festuca,,20%
+STK,1,under,under-3,grass,SCSC,,15%
+STK,1,under,under-3,grass,Hesperostipa,,5%
+STK,1,under,under-3,ground,BG,,50%
+STK,1,open,open-1,grass,SPAI,,100%
+STK,1,open,open-2,grass,ANGE,,75%
+STK,1,open,open-2,grass,SPAI,,25%
+STK,1,open,open-3,forb,forb,,2%
+STK,1,open,open-3,grass,SPAI,,100%
+STK,2,,,tree,JUDE2,65.5,
+STK,2,under,under-1,grass,PAOL,,50%
+STK,2,under,under-1,grass,BOGR,,15%
+STK,2,under,under-1,grass,ANGE,,70%
+STK,2,under,under-1,grass,Setaria,,15%
+STK,2,under,under-1,ground,BG,,15%
+STK,2,under,under-2,grass,ANGE,,50%
+STK,2,under,under-2,grass,Hesperostipa,,5%
+STK,2,under,under-2,grass,Sporobolus FB,,15%
+STK,2,under,under-2,grass,BOGR,,5%
+STK,2,under,under-3,grass,Setaria,,85%
+STK,2,under,under-3,grass,ANGE,,10%
+STK,2,under,under-3,grass,Sporobolus FB,,2%
+STK,2,under,under-3,ground,BG,,5%
+STK,2,open,open-1,forb,forb,,1%
+STK,2,open,open-1,grass,Sporobolus FB,,30%
+STK,2,open,open-1,grass,BOHI,,2%
+STK,2,open,open-1,grass,BOGR,,3%
+STK,2,open,open-1,ground,BG,,10%
+STK,2,open,open-2,grass,BOGR,,40%
+STK,2,open,open-2,grass,BUDA,,5%
+STK,2,open,open-2,grass,ANGE,,10%
+STK,2,open,open-2,forb,forb,,1%
+STK,2,open,open-2,grass,Hesperostipa,,15%
+STK,2,open,open-2,grass,MU unkown,,2%
+STK,2,open,open-3,grass,Sporobolus FB,,50%
+STK,2,open,open-3,forb,forb,,10%
+STK,2,open,open-3,grass,SCSC,,5%
+STK,2,open,open-3,grass,PAOL,,2%
+STK,3,,,tree,JUDE2,20.7,
+STK,3,,,tree,JUDE2,15,
+STK,3,,,tree,JUDE2,10.4,
+STK,3,,,tree,JUDE2,2.5,
+STK,3,under,under-1,grass,Hesperostipa,,75%
+STK,3,under,under-1,ground,BG,,25%
+STK,3,under,under-2,grass,PIFI,,20%
+STK,3,under,under-2,grass,SCSC,,20%
+STK,3,under,under-2,grass,BOGR,,3%
+STK,3,under,under-2,grass,grass unkown,,1%
+STK,3,under,under-3,grass,SCSC,,5%
+STK,3,under,under-3,grass,BOHI,,5%
+STK,3,under,under-3,grass,PIFI,,25%
+STK,3,under,under-3,ground,BG,,30%
+STK,3,under,under-3,forb,forb,,5%
+STK,3,open,open-1,grass,"Aristida ""curly""",,10%
+STK,3,open,open-1,grass,PAOL,,3%
+STK,3,open,open-1,grass,SPAI,,30%
+STK,3,open,open-1,ground,BG,,25%
+STK,3,open,open-2,grass,SPAI,,2%
+STK,3,open,open-2,grass,MU unkown,,2%
+STK,3,open,open-2,grass,"Aristida ""FS""",,1%
+STK,3,open,open-2,ground,BG,,75%
+STK,3,open,open-2,grass,MUBIG,,2%
+STK,3,open,open-2,grass,MU SPIKE,,30%
+STK,3,open,open-3,grass,SCSC,,2%
+STK,3,open,open-3,grass,MUSPIKE,,10%
+STK,3,open,open-3,grass,SPAI,,5%
+STK,3,open,open-3,grass,"Aristida ""FS""",,10%
+STK,3,open,open-3,ground,BG,,30%
+STK,4,,,tree,QUGR3,30,
+STK,4,,,tree,QUGR3,44.5,
+STK,4,,,tree,QUGR3,57,
+STK,4,under,under-1,grass,PIFI,,50%
+STK,4,under,under-1,ground,BG,,50%
+STK,4,under,under-1,grass,grass unkown 2,,1%
+STK,4,under,under-2,grass,PIFI,,90%
+STK,4,under,under-2,ground,BG,,10%
+STK,4,under,under-3,grass,PIFI,,75%
+STK,4,under,under-3,grass,Hesperostipa,,5%
+STK,4,under,under-3,ground,BG,,20%
+STK,4,open,open-1,grass,MUSPIKE,,12%
+STK,4,open,open-1,grass,BOGR,,25%
+STK,4,open,open-1,grass,"Aristida ""FS""",,15%
+STK,4,open,open-1,ground,BG,,48%
+STK,4,open,open-2,grass,MUSPIKE,,85%
+STK,4,open,open-2,grass,BOGR,,50%
+STK,4,open,open-2,grass,"Aristida ""FS""",,1%
+STK,4,open,open-2,grass,ANGE,,5%
+STK,4,open,open-3,grass,SPAI,,20%
+STK,4,open,open-3,grass,BOGR,,25%
+STK,4,open,open-3,grass,"Aristida ""FS""",,20%
+STK,4,open,open-3,forb,forb,,1%
+STK,4,open,open-3,grass,MUSPIKE,,20%
+STK,4,open,open-3,ground,BG,,15%
+STK,5,,,tree,JUDE2,35.5,
+STK,5,,,tree,JUDE2,18.5,
+STK,5,,,tree,JUDE2,25,
+STK,5,,,tree,JUDE2,38.2,
+STK,5,under,under-1,grass,FEAR,,2%
+STK,5,under,under-1,grass,PIFI,,50%
+STK,5,under,under-1,grass,ANGE,,5%
+STK,5,under,under-1,ground,BG,,42%
+STK,5,under,under-2,grass,Hesperostipa,,4%
+STK,5,under,under-2,grass,ANGE,,30%
+STK,5,under,under-2,grass,SCSC,,5%
+STK,5,under,under-2,ground,BG,,62%
+STK,5,under,under-3,grass,PIFI,,10%
+STK,5,under,under-3,grass,ANGE,,5%
+STK,5,under,under-3,grass,FEAR,,30%
+STK,5,under,under-3,ground,BG,,45%
+STK,5,under,under-3,grass,PAOL,,10%
+STK,5,open,open-1,grass,MUSPIKE,,75%
+STK,5,open,open-1,grass,ANGE,,30%
+STK,5,open,open-1,grass,"Aristida ""FS""",,10%
+STK,5,open,open-2,ground,BOGR,,90%
+STK,5,open,open-2,grass,MUSPIKE,,10%
+STK,5,open,open-2,ground,BG,,5%
+STK,5,open,open-3,grass,ANGE,,30%
+STK,5,open,open-3,grass,"Aristida ""FS""",,20%
+STK,5,open,open-3,grass,MUSPIKE,,70%
+STK,6,,,tree,JUDE2,25.5,
+STK,6,,,tree,JUDE2,21.9,
+STK,6,,,tree,JUDE2,11,
+STK,6,,,tree,JUDE2,23.7,
+STK,6,,,tree,JUDE2,22.9,
+STK,6,,,tree,JUDE2,17,
+STK,6,under,under-1,grass,ANGE,,60%
+STK,6,under,under-1,grass,SPAI,,5%
+STK,6,under,under-1,grass,PIFI,,10%
+STK,6,under,under-1,ground,BG,,25%
+STK,6,under,under-2,grass,MUBIG,,25%
+STK,6,under,under-2,grass,SPAI,,10%
+STK,6,under,under-2,tree sapling,QUGR3,,10%
+STK,6,under,under-2,grass,PIFI,,70%
+STK,6,under,under-2,ground,BG,,5%
+STK,6,under,under-3,grass,PIFI,,60%
+STK,6,under,under-3,grass,SCSC,,30%
+STK,6,under,under-3,ground,BG,,20%
+STK,6,open,open-1,grass,MUSPIKE,,40%
+STK,6,open,open-1,grass,BOGR,,70%
+STK,6,open,open-1,ground,BG,,3%
+STK,6,open,open-2,grass,BOGR,,50%
+STK,6,open,open-2,grass,ANGE,,5%
+STK,6,open,open-2,grass,MUSPIKE,,45%
+STK,6,open,open-2,ground,BG,,20%
+STK,6,open,open-3,grass,MUBIG,,35%
+STK,6,open,open-3,ground,BG,,70%
+STK,6,open,open-3,grass,BOGR,,10%
+STK,6,,open-3,grass,ANGE,,2%
+STK,7,,,tree,JUDE2,56,
+STK,7,,,tree,JUDE2,10.6,
+STK,7,,,tree,JUDE2,16.1,
+STK,7,under,under-1,grass,FEAR,,5%
+STK,7,under,under-1,tree sapling,QUGR3,,10%
+STK,7,under,under-1,grass,ANGE,,30%
+STK,7,under,under-1,grass,PIFI,,60%
+STK,7,under,under-2,grass,PIFI,,95%
+STK,7,under,under-2,grass,FEAR,,15%
+STK,7,under,under-2,ground,BG,,10%
+STK,7,under,under-3,grass,PIFI,,90%
+STK,7,under,under-3,grass,PAOL,,30%
+STK,7,open,open-1,grass,"Aristida ""FS""",,20%
+STK,7,open,open-1,grass,BOGR,,80%
+STK,7,open,open-1,grass,MUSPIKE,,20%
+STK,7,open,open-1,ground,BG,,5%
+STK,7,open,open-2,grass,MUBIG,,80%
+STK,7,open,open-2,grass,"Aristida ""FS""",,10%
+STK,7,open,open-2,ground,BG,,10%
+STK,7,open,open-3,grass,SPAI,,15%
+STK,7,open,open-3,grass,"Aristida ""FS""",,25%
+STK,7,open,open-3,grass,MUSPIKE,,25%
+STK,7,open,open-3,grass,BOGR,,50%
+STK,7,open,open-3,ground,BG,,5%
+STK,8,,,tree,JUDE2,20.2,
+STK,8,,,tree,JUDE2,16.8,
+STK,8,under,under-1,grass,PIFI,,75%
+STK,8,under,under-1,grass,PAOL,,5%
+STK,8,under,under-1,ground,BG,,20%
+STK,8,under,under-2,grass,Hesperostipa,,10%
+STK,8,under,under-2,grass,PIFI,,90%
+STK,8,under,under-3,grass,PIFI,,75%
+STK,8,under,under-3,ground,BG,,25%
+STK,8,open,open-1,grass,BOGR,,40%
+STK,8,open,open-1,grass,ANGE,,15%
+STK,8,open,open-1,grass,MUSPIKE,,30%
+STK,8,open,open-1,grass,"Aristida ""FS""",,30%
+STK,8,open,open-1,grass,Sporobolus FB,,1%
+STK,8,open,open-1,ground,BG,,10%
+STK,8,open,open-2,grass,BOGR,,25%
+STK,8,open,open-2,grass,MUSPIKE,,60%
+STK,8,open,open-2,grass,"Aristida ""FS""",,15%
+STK,8,open,open-2,ground,BG,,25%
+STK,8,open,open-3,grass,SPAI,,20%
+STK,8,open,open-3,grass,"Aristida ""FS""",,20%
+STK,8,open,open-3,grass,MUSPIKE,,35%
+STK,8,open,open-3,grass,BOGR,,15%
+STK,8,open,open-3,ground,BG,,25%
+STK,9,,,tree,JUDE2,57,
+STK,9,,,tree,JUDE2,44.1,
+STK,9,under,under-1,grass,PIFI,,60%
+STK,9,under,under-1,grass,PAOL,,1%
+STK,9,under,under-1,grass,ANGE,,30%
+STK,9,under,under-1,ground,BG,,10%
+STK,9,under,under-2,grass,PIFI,,50%
+STK,9,under,under-2,ground,BG,,50%
+STK,9,under,under-3,grass,PIFI,,40%
+STK,9,under,under-3,grass,SCSC,,10%
+STK,9,under,under-3,grass,LEDU,,10%
+STK,9,under,under-3,ground,BG,,60%
+STK,9,open,open-1,grass,MUBIG,,10%
+STK,9,open,open-1,grass,MUSPIKE,,50%
+STK,9,open,open-2,grass,SCSC,,5%
+STK,9,open,open-2,grass,MU unkown,,40%
+STK,9,open,open-2,grass,BOGR,,10%
+STK,9,open,open-2,ground,BG,,5%
+STK,9,open,open-2,grass,BOHI,,40%
+STK,9,open,open-2,grass,SPCR,,3%
+STK,9,open,open-2,grass,"Aristida ""FS""",,3%
+STK,9,open,open-3,grass,ANGE,,40%
+STK,9,open,open-3,grass,BOGR,,45%
+STK,9,open,open-3,ground,BG,,20%
+STK,9,open,open-3,grass,SPPY,,2%
+WIM,1,,,tree,JUDE2,51.9,
+WIM,1,under,under-1,tree sapling,QUGR3,,20%
+WIM,1,under,under-1,grass,PIFI,,25%
+WIM,1,under,under-1,grass,ANGE,,30%
+WIM,1,under,under-1,tree sapling,JUDE2,,10%
+WIM,1,under,under-1,ground,BG,,35%
+WIM,1,under,under-2,grass,PIFI,,30%
+WIM,1,under,under-2,tree sapling,QUGR3,,5%
+WIM,1,under,under-2,shrub,ACAN,,5%
+WIM,1,under,under-2,ground,BG,,75%
+WIM,1,under,under-2,grass,ANGE,,2%
+WIM,1,under,under-3,tree sapling,QUGR3,,15%
+WIM,1,under,under-3,grass,PIFI,,15%
+WIM,1,under,under-3,grass,ANGE,,5%
+WIM,1,under,under-3,grass,grass unkown 3,,5%
+WIM,1,under,under-3,ground,BG,,75%
+WIM,1,open,open-1,grass,BOGR,,10%
+WIM,1,open,open-1,grass,PAHA,,40%
+WIM,1,open,open-1,ground,BG,,50%
+WIM,1,open,open-2,grass,PAHA,,5%
+WIM,1,open,open-2,grass,ERLE,,25%
+WIM,1,open,open-2,grass,MUSPIKE,,15%
+WIM,1,open,open-2,ground,BG,,65%
+WIM,1,open,open-3,grass,PAHA,,70%
+WIM,1,open,open-3,grass,BOGR,,11%
+WIM,1,open,open-3,grass,grass unkown 4,,10%
+WIM,1,open,open-3,ground,BG,,25%
+WIM,2,,,tree,JUDE2,80.7,
+WIM,2,under,under-1,grass,ANGE,,25%
+WIM,2,under,under-1,grass,Setaria,,20%
+WIM,2,under,under-1,grass,PAOL,,90%
+WIM,2,under,under-1,grass,FEAR,,20%
+WIM,2,under,under-2,grass,ANGE,,30%
+WIM,2,under,under-2,grass,PIFI,,20%
+WIM,2,under,under-2,grass,FEAR,,40%
+WIM,2,under,under-3,grass,PIFI,,35%
+WIM,2,under,under-3,grass,PAOL,,55%
+WIM,2,under,under-3,grass,FEAR,,10%
+WIM,2,open,open-1,grass,ANGE,,20%
+WIM,2,open,open-1,grass,PAHA,,80%
+WIM,2,open,open-1,ground,BG,,10%
+WIM,2,open,open-2,grass,BOGR,,40%
+WIM,2,open,open-2,grass,SCSC,,50%
+WIM,2,open,open-2,ground,BG,,10%
+WIM,2,open,open-3,grass,SCSC,,80%
+WIM,2,open,open-3,grass,PAHA,,15%
+WIM,2,open,open-3,grass,BOGR,,10%
+WIM,2,open,open-3,ground,BG,,5%
+WIM,3,,,tree,QUGR3,39.3,
+WIM,3,under,under-1,grass,PIFI,,60%
+WIM,3,under,under-1,tree sapling,QUGR3,,1%
+WIM,3,under,under-1,grass,Setaria,,10%
+WIM,3,under,under-1,ground,BG,,25%
+WIM,3,under,under-1,grass,MUBIG,,10%
+WIM,3,under,under-2,tree sapling,JUDE2,,20%
+WIM,3,under,under-2,grass,PIFI,,25%
+WIM,3,under,under-2,grass,FEAR,,15%
+WIM,3,under,under-2,ground,BG,,50%
+WIM,3,under,under-3,grass,PIFI,,25%
+WIM,3,under,under-3,grass,Setaria,,10%
+WIM,3,under,under-3,ground,BG,,70%
+WIM,3,open,open-1,grass,BOGR,,30%
+WIM,3,open,open-1,grass,"Aristida ""curly""",,3%
+WIM,3,open,open-1,grass,SCSC,,30%
+WIM,3,open,open-1,grass,MUSPIKE,,15%
+WIM,3,open,open-1,ground,BG,,25%
+WIM,3,open,open-2,grass,BOCU,,15%
+WIM,3,open,open-2,grass,SCSC,,5%
+WIM,3,open,open-2,ground,BG,,50%
+WIM,3,open,open-2,grass,BOGR,,25%
+WIM,3,open,open-2,grass,ERLE,,5%
+WIM,3,open,open-3,forb,Acacia,,10%
+WIM,3,open,open-3,grass,BOCU,,15%
+WIM,3,open,open-3,grass,"Aristida ""curly""",,5%
+WIM,3,open,open-3,grass,BOGR,,40%
+WIM,3,open,open-3,grass,MUBIG,,10%
+WIM,3,open,open-3,grass,ERLE,,15%
+WIM,3,open,open-3,ground,BG,,20%
+WIM,4,,,tree,JUDE2,66.4,
+WIM,4,under,under-1,grass,Hesperostipa,,5%
+WIM,4,under,under-1,grass,PIFI,,2%
+WIM,4,under,under-1,grass,ANGE,,40%
+WIM,4,under,under-1,ground,BG,,60%
+WIM,4,under,under-2,grass,Hesperostipa,,75%
+WIM,4,under,under-2,grass,ANGE,,25%
+WIM,4,under,under-2,ground,BG,,5%
+WIM,4,under,under-3,grass,Hesperostipa,,30%
+WIM,4,under,under-3,grass,PIFI,,45%
+WIM,4,under,under-3,grass,ANGE,,35%
+WIM,4,open,open-1,grass,BOGR,,55%
+WIM,4,open,open-1,grass,PAOL,,30%
+WIM,4,open,open-1,grass,ANGE,,1%
+WIM,4,open,open-1,ground,BG,,15%
+WIM,4,open,open-2,tree sapling,JUDE2,,20%
+WIM,4,open,open-2,grass,SC unknown,,50%
+WIM,4,open,open-2,grass,MUBIG,,25%
+WIM,4,open,open-2,ground,BG,,20%
+WIM,4,open,open-3,grass,BOGR,,50%
+WIM,4,open,open-3,grass,"Aristida ""FS""",,5%
+WIM,4,open,open-3,forb,forb,,3%
+WIM,4,open,open-3,ground,BG,,50%
+WIM,5,,,tree,QUGR3,33,
+WIM,5,under,under-1,grass,PIFI,,70%
+WIM,5,under,under-1,grass,ANGE,,40%
+WIM,5,under,under-2,tree sapling,QUEM,,20%
+WIM,5,under,under-2,tree sapling,JUDE2,,20%
+WIM,5,under,under-2,grass,PIFI,,80%
+WIM,5,under,under-2,ground,BG,,10%
+WIM,5,under,under-3,grass,PIFI,,60%
+WIM,5,under,under-3,grass,ANGE,,10%
+WIM,5,under,under-3,ground,BG,,30%
+WIM,5,open,open-1,tree sapling,JUDE2,,5%
+WIM,5,open,open-1,tree sapling,QUGR3,,2%
+WIM,5,open,open-1,grass,MUBIG,,35%
+WIM,5,open,open-1,grass,PIFI,,45%
+WIM,5,open,open-1,ground,BG,,15%
+WIM,5,open,open-2,grass,Hesperostipa,,2%
+WIM,5,open,open-2,tree sapling,QUGR3,,10%
+WIM,5,open,open-2,grass,ERLE,,5%
+WIM,5,open,open-2,grass,BOCU,,20%
+WIM,5,open,open-2,ground,BG,,60%
+WIM,5,open,open-3,grass,SC unknown,,30%
+WIM,5,open,open-3,grass,ANGE,,10%
+WIM,5,open,open-3,grass,MUSPIKE,,15%
+WIM,5,open,open-3,grass,BOGR,,25%
+WIM,5,open,open-3,ground,BG,,20%
+WIM,6,,,tree,JUDE2,34.1,
+WIM,6,,,tree,JUDE2,22,
+WIM,6,,,tree,PICE,10.4,
+WIM,6,under,under-1,grass,PIFI,,55%
+WIM,6,under,under-1,tree sapling,QUGR3,,3%
+WIM,6,under,under-1,ground,BG,,65%
+WIM,6,under,under-2,grass,PIFI,,75%
+WIM,6,under,under-2,ground,BG,,25%
+WIM,6,under,under-3,grass,PIFI,,60%
+WIM,6,under,under-3,ground,BG,,40%
+WIM,6,open,open-1,grass,BOGR,,25%
+WIM,6,open,open-1,grass,BOCU,,10%
+WIM,6,open,open-1,grass,SC unknown,,70%
+WIM,6,open,open-2,grass,BOCU,,40%
+WIM,6,open,open-2,grass,BOGR,,35%
+WIM,6,open,open-2,ground,BG,,35%
+WIM,6,open,open-3,Herb,Juncus,,40%
+WIM,6,open,open-3,grass,"Aristida ""curly""",,5%
+WIM,6,open,open-3,grass,BOCU,,25%
+WIM,6,open,open-3,grass,BOGR,,20%
+WIM,6,open,open-3,ground,BG,,15%
+WIM,7,,,tree,JUDE2,23.8,
+WIM,7,under,under-1,grass,PIFI,,40%
+WIM,7,under,under-1,grass,"Aristida ""curly""",,15%
+WIM,7,under,under-1,grass,BOCU,,20%
+WIM,7,under,under-1,grass,BOGR,,15%
+WIM,7,under,under-1,ground,BG,,30%
+WIM,7,under,under-1,grass,SCSC,,5%
+WIM,7,under,under-2,grass,ANGE,,30%
+WIM,7,under,under-2,grass,BOCU,,20%
+WIM,7,under,under-2,ground,BG,,30%
+WIM,7,under,under-2,grass,PIFI,,35%
+WIM,7,under,under-3,grass,PIFI,,10%
+WIM,7,under,under-3,grass,BOCU,,25%
+WIM,7,under,under-3,grass,SCSC,,15%
+WIM,7,under,under-3,grass,BOGR,,35%
+WIM,7,under,under-3,ground,BG,,15%
+WIM,7,open,open-1,grass,BOGR,,50%
+WIM,7,open,open-1,grass,MUSPIKE,,20%
+WIM,7,open,open-1,grass,ANGE,,10%
+WIM,7,open,open-1,ground,BG,,20%
+WIM,7,open,open-2,grass,SCSC,,30%
+WIM,7,open,open-2,grass,MUBIG,,50%
+WIM,7,open,open-2,grass,"Aristida ""curly""",,5%
+WIM,7,open,open-2,grass,BOGR,,25%
+WIM,7,open,open-3,grass,MUBIG,,60%
+WIM,7,open,open-3,grass,BOCU,,10%
+WIM,7,open,open-3,ground,BG,,35%
+WIM,8,,,tree,QUGR3,27.4,
+WIM,8,,,tree,QUGR3,24.2,
+WIM,8,,,tree,QUGR3,30,
+WIM,8,under,under-1,tree sapling,JUDE2,,30%
+WIM,8,under,under-1,grass,PIFI,,50%
+WIM,8,under,under-1,grass,Hesperostipa,,5%
+WIM,8,under,under-1,grass,MUBIG,,3%
+WIM,8,under,under-1,ground,BG,,15%
+WIM,8,under,under-1,grass,ANGE,,10%
+WIM,8,under,under-2,grass,Hesperostipa,,50%
+WIM,8,under,under-2,grass,MUBIG,,35%
+WIM,8,under,under-2,forb,ACAN,,25%
+WIM,8,under,under-2,ground,BG,,10%
+WIM,8,under,under-3,grass,Hesperostipa,,55%
+WIM,8,under,under-3,grass,PIFI,,10%
+WIM,8,under,under-3,tree sapling,JUDE2,,1%
+WIM,8,under,under-3,ground,BG,,35%
+WIM,8,open,open-1,grass,SCSC,,30%
+WIM,8,open,open-1,grass,"Aristida ""curly""",,5%
+WIM,8,open,open-1,grass,MUBIG,,30%
+WIM,8,open,open-1,grass,MUSPIKE,,25%
+WIM,8,open,open-1,ground,BG,,10%
+WIM,8,open,open-2,tree sapling,QUGR3,,15%
+WIM,8,open,open-2,grass,BOCU,,10%
+WIM,8,open,open-2,grass,SCSC,,10%
+WIM,8,open,open-2,grass,BOGR,,40%
+WIM,8,open,open-2,ground,BG,,25%
+WIM,8,open,open-2,grass,MUSPIKE,,10%
+WIM,8,open,open-3,grass,MUBIG,,35%
+WIM,8,open,open-3,grass,SCSC,,20%
+WIM,8,open,open-3,grass,"Aristida ""curly""",,10%
+WIM,8,open,open-3,ground,BG,,20%
+WIM,8,open,open-3,grass,"Aristida ""FS""",,15%
