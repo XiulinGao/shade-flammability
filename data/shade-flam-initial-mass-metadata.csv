@@ -1,0 +1,1 @@
+﻿variable,type,unit,descriptionspcode,string,,"a uniqe code for study species, see species-info.csv for details"rep,string,,number of replicationsweight,numeric,g,oven-dried biomass of each sample,,,

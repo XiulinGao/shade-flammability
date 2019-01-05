@@ -1,0 +1,1 @@
+﻿variable,type,unit,descriptionlabel,string,,"uniqe label for each sample, a combination of species code and relication number"treatment,string,,"treatment type: nb for destructive measurement, b for burning"spcode,string,,"species code, scientific name see DMT-species.csv"dia10,numeric,cm,diameter of each sample at 10cm plant height
