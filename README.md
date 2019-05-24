@@ -71,7 +71,7 @@ Studied species information is stored in data/species-info.csv, currently the fi
 
 5. data/shade-flam-initial-biomass.csv stores the initial oven-dried aboveground biomass for each species by harvesting 10-12 seedlings right before light treatments were applied. data/shade-flam-final-biomass.csv stores the final oven-dried aboveground biomass 4 months after the light treatment by harvesting one plant in each pot. These measurements are used to assess how different species response to 50% shade by comparing the relative aboveground biomass gained by plant growing under shade. 
 
-6. data/burning-trial.csv stores flammability measurements including consumability, aluminum disc temperature, maximum flame temperature, ignition delay, flaming and smoldering combustion. 
+6. data/burning-trial.csv stores flammability measurements including consumability, aluminum disc temperature, maximum flame height, ignition delay, flaming and smoldering combustion. 
 
 7. data/balance folder stores balance data for each plant that is used to calculate maximum biomass loss rate; data/hobo folder stores hobo data that is used to summarize flame temperature for each burning trial such as temperature integration above 100 celsius degree and heating duration when temp is above 100 Celsius degree. 
 
