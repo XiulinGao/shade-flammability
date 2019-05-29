@@ -35,11 +35,11 @@ read_balance_file <- function(filen) {
   file_string <- readr::read_file(filen)
 
   if(str_detect(file_string, "Enter a label:")) {
-   # print("We have a raw format file")
+    # print("We have a raw format file")
     file_string <- str_sub(file_string, 16)
-    needed_cols <- c(1,3)
+    needed_cols <- c(1,4) # "label" col are all "" empty so weight is 4th col
   } else {
-  #  print("We have a hydro format file")
+    # print("We have a hydro format file")
     pos <- str_locate(file_string, "[^\n]+\n[^\n]+\n")[2]
     file_string <- str_sub(file_string, pos+1)
     needed_cols <- c(1,2)
@@ -49,8 +49,9 @@ read_balance_file <- function(filen) {
   # Now read the file from the string and extract the two columns we need, time
   # and weight.
   file_dat <- read.csv(text=file_string, header=FALSE, sep="\t",
-                       stringsAsFactors=FALSE) %>%
-    dplyr::select(needed_cols)
+                         stringsAsFactors=FALSE)
+
+  file_dat <- file_dat[,needed_cols]
   
   names(file_dat) <- c("time", "weight")
   file_dat <- mutate(file_dat, time = gsub(",", ".", time, fixed=TRUE),
