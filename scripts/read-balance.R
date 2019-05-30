@@ -15,10 +15,14 @@ source("./burning-trial-summary.R")
 # read and clean a single balance file produced by serial-balance.py. See
 # https://github.com/schwilklab/serial-balance
 
-## DWS: add comment explaining why the raw data is in two different formats so
-## that the complicated code below makes sense.
-# read mutiple .csv files at once and rbind them as a file based
-# on files. balance data from 20190329 burn has different formats
+## balance data was read under two different modes. Data from 20190329 burning date 
+## was under raw balance data reading mode and the data has mainly 3 outputs:
+## time in ymd:hmos, weight in mg, and accumulative number of seconds in millionseconds 
+## since the first reading. Data after that were are read under hydraulic mode, 
+## of which the outputs contain time, weight, and other 3 columns that are 
+## not necessary for loss rate calculation.because data are stored in 
+## two different formats, we have to write code to deal with it
+## and mainly extract the time and weight from each file for loss rate calculation later. 
 
 # file names that contain all burns from 20190329 burning dates
 # which are produced by raw-balance reading mode
