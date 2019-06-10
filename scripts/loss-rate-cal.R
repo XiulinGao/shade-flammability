@@ -103,7 +103,7 @@ for (i in 1:length(decayID)){
        }, error = function(e){
         message("caught error")
         print(e) #print original error message
-        print(paste(decayID[i], "can't fit exponential model"))
+        print(paste(decayID[i], "can't fit exponential model", sep=" "))
       }
     )
 }
