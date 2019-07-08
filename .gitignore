@@ -1,4 +1,8 @@
+# R related
 *.[Rr][Dd]ata
 *.Rhistory
 *.rproj
+
+# os stuff
 *.DS_Store
+.directory
