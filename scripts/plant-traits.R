@@ -102,7 +102,13 @@ sum4 <- catiller.open %>% mutate(total.vol = pi/3 * h2 * (ave.baseW/2*ave.baseW/
 ## combine all and calculate total volume (except for the special case)
 vol.sum <- bind_rows(sum1, sum2, sum3, sum4)
 
-  
+
+
+ 
+
+## clean env
+rm("case1", "case2", "case3", "sum1", "sum2", "sum3", "sum4", "nleaf_sum",
+   "wleaf_sum")
 
 
 
