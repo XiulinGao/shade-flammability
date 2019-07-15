@@ -76,3 +76,11 @@ read_all_balance_files <-function() {
   
 # main script:
 balance_data <- read_all_balance_files()
+
+# join trial data and convert mg to g for weight
+
+balance_data <- left_join(balance_data, trials, by = "label")
+balance_data <- balance_data %>%
+  mutate (weight = weight*0.001)
+
+
