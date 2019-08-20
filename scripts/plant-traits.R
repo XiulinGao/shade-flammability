@@ -1,6 +1,7 @@
 ## read plant traits data and do specific leaf area(SLA), surface to volume ratio (SA:V), 
 ## biomass density,fuel moisture content, biomass height ratio calculation
 library(dplyr)
+source("./shade-tolerance-ranking.R")
 
 ## read leaf dimension and dry mass data for wide leaf and leaf resembles needle
 ## for SLA and surface area to volume ratio calculation
@@ -25,6 +26,7 @@ fmc.mratio <- read.csv("../data/fmc-leaf-culm-ratio.csv", stringsAsFactors = FAL
 wleaf_sum <- wleaf %>% group_by (spcode, light, block, treatment, rep) %>%
   mutate(sla = round(area/mass, 2)) %>%
   mutate (mean.dia = mean(thick.a, thick.b, thick.c, trim = 0, na.rm = TRUE),
+    mean.dia = mean.dia/10, #covert mm to cm
                           sav = round(1/mean.dia, 2))
 
 nleaf <- nleaf %>% mutate(dia.a = dia.a/10, dia.b = dia.b/10) #convert thickness to cm
@@ -37,14 +39,21 @@ nleaf_sum <- nleaf %>%  group_by(spcode, light, block, treatment, rep) %>%
   mean.dia= mean(dia.a, dia.b, trim = 0, na.rm = TRUE)) %>%
   mutate(sla = round(sa/mass, 2), sav = round (1/mean.dia,2 ))
 
-## combine two 
+## combine two summary datasets and only keep calculated specific leaf area 
+## and surface area to volume ratio for each plant with 3 replicates per plant
 leaftrait <- bind_rows (nleaf_sum, wleaf_sum) %>%
 select(spcode, light, block, treatment, rep, sla, sav) %>%
   filter(!is.na(sla))
+leaftrait.sum <- leaftrait %>% group_by(spcode, light, block, treatment) %>%
+  summarise(ave.sla = mean(sla, trim = 0, na.rm = TRUE),
+            sd.sla = sd(sla, na.rm = TRUE),
+            ave.sav = mean(sav, trim = 0, na.rm = TRUE),
+            sd.sav = sd(sav, na.rm = TRUE))
 
 ## biomass density: assume plant enclosed is made up by 3 sections: one
 ## truncated cone at the bottom before it touches the cylinder (12.6cm in diameter), one
-## cylinder section and another truncated cone at the top
+## cylinder section from where it starts touching the cylinder to 
+## the top end of the cylinder, and another truncated cone that extends out of the cylinder.
 ## height of wire cylinder is 30cm, so the cylinder section of the plant parts
 ## enclosed is (30-h1), height of truncated cone at bottom is h1, and height of
 ## truncated cone at top is (h2-30)
@@ -57,22 +66,25 @@ mutate(ave.tiller1tck = round((tiller1tck.a + tiller1tck.b)/(2*10), 2),
 # calculate average tiller thickness and convert mm to cm 
 
 ## as there are cases where the plant never touched the cylinder and no part extended out
-## I'll split the data and calculate volume for each case 
+## I'll calculate volume for each case differently
 
 case1 <- catiller %>% filter(is.na(h1)) %>% 
      mutate(total.vol = pi/3 * h2 * (ave.baseW/2*ave.baseW/2 + ave.canW/2*ave.canW/2 + 
                                       ave.baseW/2 * ave.canW/2))
+#plant enclosed never touched the cylinder and no parts extended out 
 
 case2 <- catiller %>% filter(!is.na(h1) & h2>30) %>%
   mutate(cyl.h = 30-h1, tcone2.h = h2-30) %>%
         mutate(bcone.vol = pi/3 * h1 * (6.3*6.3 + ave.baseW/2*ave.baseW/2 + 6.3*ave.baseW/2),
                cyl.vol = pi*6.3*6.3*cyl.h, 
                tcone.vol = pi/3 * tcone2.h * (6.3*6.3 + ave.canW/2*ave.canW/2 + 6.3*ave.canW/2))
+#plant enclosed touched the cylinder and also entended out 
 
 case3 <- catiller %>% filter(!is.na(h1) & h2<=30) %>%
   mutate(cyl.h = h2 - h1) %>%
   mutate(bcone.vol = pi/3 * h1 * (6.3*6.3 + ave.baseW/2*ave.baseW/2 + 6.3*ave.baseW/2),
          cyl.vol = pi*6.3*6.3*cyl.h)
+#plant enclosed did touch the cylinder, however, no portion extended out
 
 ## calculate average total volume and sd of total volume for each case
 sum1 <- case1 %>% group_by ( spcode, light, block) %>%
@@ -102,10 +114,10 @@ sum4 <- catiller.open %>% mutate(total.vol = pi/3 * h2 * (ave.baseW/2*ave.baseW/
 ## combine all and calculate total volume (except for the special case)
 vol.sum <- bind_rows(sum1, sum2, sum3, sum4)
 
-
-
- 
-
+## combine leaf trait, volume, and shade tolerance to make a complete traits dataset
+grasstraits <- leaftrait.sum %>% left_join(vol.sum, by = c("spcode", "light",
+                                                           "block")) %>%
+  left_join(modrank, by = "spcode")
 ## clean env
 rm("case1", "case2", "case3", "sum1", "sum2", "sum3", "sum4", "nleaf_sum",
    "wleaf_sum")
