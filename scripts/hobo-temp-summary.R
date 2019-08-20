@@ -6,7 +6,7 @@ library(stringr)
 library(tidyr)
 library(ggplot2)
 
-TZ = "CST6CDT"
+#TZ = "CST6CDT"
 source("./burning-trial-summary.R")
 
 read_hobo_file <- function(filename) {
@@ -45,7 +45,7 @@ thermocouples.wide <- base %>% full_join(height10, by="time") %>%
   full_join(height100, by="time") 
 
 thermocouples.wide <- thermocouples.wide %>% mutate_at(c("base", "height.10",
-                                   "height.50", "height.100"),funs(round(.,2)))
+                                   "height.50", "height.100"),list(~ round(.,2)))
 
 ## get label from a time point
 get_trial_label <- function(time) {
