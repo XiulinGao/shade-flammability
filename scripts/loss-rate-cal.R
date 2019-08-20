@@ -20,7 +20,7 @@ balance_data <- balance_data %>% group_by (label) %>%
          septime = 50+ignition+combustion)
 
 # plot weight against diff_time for each trial
-# whole balance data and flaming combustion only
+# complete trial and flaming combustion only
 #label <- unique(balance_data$label)
 
 #for (i in 1:length(label)) {
@@ -116,8 +116,9 @@ flamNLModsCoef_sig <- flamNLModsCoef %>% filter(term=="d", estimate<0) %>%
 ggplot(decayNLModsCoef_sig, aes(spcode, estimate)) + geom_point()
 ggplot(flamNLModsCoef_sig, aes(spcode, estimate)) + geom_point()
 # seems maximum biomass loss rate didn't differ among species
-#qplot(flam.nlaics, nlaics) # only fit negative exponential to flaming stage
-# works better
+#qplot(flam.nlaics, nlaics) 
+# only fit negative exponential to flaming stage works better
+
 
 ## Approach 2: fit flamming stage balance data to linear model
 
@@ -137,7 +138,8 @@ laics <- sapply(flamingLMods$flamingmod, AIC)
 #flam.nlaics <- filter(flam.nlaics, !is.na(flam.nlaics))
 #laics <- as.data.frame(laics)
 #plot(flam.nlaics$flam.nlaics, laics$laics)
-# negative exponential model works better
+# negative exponential model works better. In conclusion, negative exponential model
+# fit for only flaming stage works the best
 ## clean env
 rm("decayID", "i", "subdecay", "mod_coef", "subflam",
    "flam_coef", "flamNLMod", "flamID", "flammods",
