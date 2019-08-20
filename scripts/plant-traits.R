@@ -117,7 +117,8 @@ vol.sum <- bind_rows(sum1, sum2, sum3, sum4)
 ## combine leaf trait, volume, and shade tolerance to make a complete traits dataset
 grasstraits <- leaftrait.sum %>% left_join(vol.sum, by = c("spcode", "light",
                                                            "block")) %>%
-  left_join(modrank, by = "spcode")
+  left_join(modrank, by = "spcode") %>%
+  mutate(label = paste(spcode, light, block, sep = ""))
 ## clean env
 rm("case1", "case2", "case3", "sum1", "sum2", "sum3", "sum4", "nleaf_sum",
    "wleaf_sum")
