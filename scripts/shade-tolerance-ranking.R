@@ -58,6 +58,14 @@ print(xtable(summary(rankshade.mod)$coefficients), type = "html",
       file = "../results/rank-shade-mod.html")
 ## very similar ranking
 
+#save mod outputs as data frame
+modrank <- tidy(rankshade.mod)
+#extrac the spcode out of term 
+modrank$spcode <- substring(modrank$term, 7)
+#assign agsc5 to first spcode element and strip off the last 2 rows and 1st, 5th column
+modrank$spcode[1] <- "agsc5"
+modrank <- modrank[-c(18:19), c(2, 6)]
+colnames(modrank)[colnames(modrank)=="estimate"] <- "shade.rank"
 ## clean environment
 rm(fmass, imass, ave.imass)
 
