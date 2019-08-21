@@ -2,6 +2,8 @@
 ## biomass density,fuel moisture content, biomass height ratio calculation
 library(dplyr)
 source("./shade-tolerance-ranking.R")
+source("./burning-trial-summary.R")
+
 
 ## read leaf dimension and dry mass data for wide leaf and leaf resembles needle
 ## for SLA and surface area to volume ratio calculation
@@ -22,6 +24,27 @@ catiller.open <- read.csv("../data/canopy-tiller-no-cylinder.csv",
 ## entire plant
 fmc.mratio <- read.csv("../data/fmc-leaf-culm-ratio.csv", stringsAsFactors = FALSE,
                        na.strings = c("", "NA", "na"))
+fmc.mratio <- fmc.mratio %>% left_join(trials, by = c("spcode", "light", "block")) %>%
+  group_by(spcode, light, block, label) %>%
+  summarise(pre.fmc = (t.fresh-m.leaf-m.nleaf)/(m.leaf+m.nleaf), 
+            post.fmc = (f.fuelresid - d.fuelresid)/d.fuelresid,
+            curate = d.fresh/t.fresh, #curing rate
+            ldratio = (t.fresh-d.fresh)/d.fresh, # live to dead fuel ratio
+            photo.ratio = m.leaf/m.nleaf) #lead to non-leaf tissue ratio
+
+## netefsb1, netefsb5, pava2sb2 and pava2fsb3 had negative post-burn fmc, most likely 
+## is due to inaccurate fresh mass measurements at the burn scene as I checked
+# for the dry mass measurement it's correct. So I may insert average fmc value for these
+# samples. 
+ave.postfmc <- fmc.mratio %>% filter(post.fmc >= 0) %>% group_by(spcode, light) %>%
+  summarize (ave.postfmc = mean(post.fmc, trim = 0, na.rm = TRUE)) %>%
+  mutate(label = paste(spcode, light, sep=""))
+#assign average post-burn fmc 
+fmc.mratio$post.fmc[which(fmc.mratio$label=="netefsb1")] <- ave.postfmc$ave.postfmc[which(ave.postfmc$label=="netefs")]
+fmc.mratio$post.fmc[which(fmc.mratio$label=="netefsb5")] <- fmc.mratio$post.fmc[which(fmc.mratio$label=="netefsb1")]
+fmc.mratio$post.fmc[which(fmc.mratio$label=="pava2sb2")] <- ave.postfmc$ave.postfmc[which(ave.postfmc$label=="pava2s")]
+fmc.mratio$post.fmc[which(fmc.mratio$label=="pava2fsb3")] <- ave.postfmc$ave.postfmc[which(ave.postfmc$label=="pava2fs")]
+
 ## SLA and SA:V ratio calculation
 wleaf_sum <- wleaf %>% group_by (spcode, light, block, treatment, rep) %>%
   mutate(sla = round(area/mass, 2)) %>%
@@ -114,14 +137,20 @@ sum4 <- catiller.open %>% mutate(total.vol = pi/3 * h2 * (ave.baseW/2*ave.baseW/
 ## combine all and calculate total volume (except for the special case)
 vol.sum <- bind_rows(sum1, sum2, sum3, sum4)
 
-## combine leaf trait, volume, and shade tolerance to make a complete traits dataset
+## combine leaf trait, volume, fmc-related traits, and shade tolerance
+## to make a complete traits dataset
 grasstraits <- leaftrait.sum %>% left_join(vol.sum, by = c("spcode", "light",
-                                                           "block")) %>%
-  left_join(modrank, by = "spcode") %>%
-  mutate(label = paste(spcode, light, block, sep = ""))
+                                                           "block")) %>% 
+  left_join(fmc.mratio, by = c("spcode", "light", "block")) %>%
+  left_join(modrank, by = "spcode")
+
+#join trials
+trait.trial <- grasstraits %>% left_join(trials, by = c("label", "spcode", "light",
+                                                        "block"))
 ## clean env
 rm("case1", "case2", "case3", "sum1", "sum2", "sum3", "sum4", "nleaf_sum",
-   "wleaf_sum")
+   "wleaf_sum", "ave.postfmc", "catiller", "catiller.open", "grasstraits", "vol.sum",
+   "leaftrait", "leaftrait.sum", "fmc.mratio", "nleaf", "wleaf")
 
 
 
