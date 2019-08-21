@@ -140,9 +140,13 @@ laics <- sapply(flamingLMods$flamingmod, AIC)
 #plot(flam.nlaics$flam.nlaics, laics$laics)
 # negative exponential model works better. In conclusion, negative exponential model
 # fit for only flaming stage works the best
+
+#rename column 'term' to 'lossrate' in flamingNLModsCoef_sig
+colnames(flamNLModsCoef_sig)[colnames(flamNLModsCoef_sig)=="estimate"] <- "lossrate"
 ## clean env
 rm("decayID", "i", "subdecay", "mod_coef", "subflam",
    "flam_coef", "flamNLMod", "flamID", "flammods",
-   "flamingLMods", "decayNLMod")
+   "flamingLMods", "decayNLMod", "decayNLModsCoef", "flamingLMcoef",
+   "flamNLModsCoef", "flam.bytrial", "bytrial")
   
 
