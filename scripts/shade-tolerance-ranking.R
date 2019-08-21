@@ -67,5 +67,5 @@ modrank$spcode[1] <- "agsc5"
 modrank <- modrank[-c(18:19), c(2, 6)]
 colnames(modrank)[colnames(modrank)=="estimate"] <- "shade.rank"
 ## clean environment
-rm(fmass, imass, ave.imass)
+rm("fmass", "imass", "ave.imass", "gmass.wide", "mass.gain")
 
