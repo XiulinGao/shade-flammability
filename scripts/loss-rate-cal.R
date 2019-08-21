@@ -91,7 +91,7 @@ for (i in 1:length(decayID)){
       if (decayID[i] %in% flamID){
         subflam <- filter(flam.bytrial, label==decayID[i])
         flamNLMod <- nls(decaym ~ c*exp(d*decayt), data=subflam, 
-                         start=list(c=subflam$decaym[1], d=0))
+                         start=list(c=mean(subflam$decaym[1:3]), d=0))
         flam.nlaics[i] <- AIC(flamNLMod)
         flam_coef <- tidy(flamNLMod)
         flam_coef$label <- subflam$label[1]
