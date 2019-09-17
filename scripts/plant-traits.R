@@ -26,25 +26,27 @@ fmc.mratio <- read.csv("../data/fmc-leaf-culm-ratio.csv", stringsAsFactors = FAL
                        na.strings = c("", "NA", "na"))
 fmc.mratio <- fmc.mratio %>% left_join(trials, by = c("spcode", "light", "block")) %>%
   group_by(spcode, light, block, label) %>%
-  summarise(pre.fmc = (t.fresh-m.leaf-m.nleaf)/(m.leaf+m.nleaf), 
+  summarise(pre.fmc = (t.fresh - m.leaf - m.nleaf)/(m.leaf + m.nleaf), 
             post.fmc = (f.fuelresid - d.fuelresid)/d.fuelresid,
+            leftfuel = d.fuelresid,
+            char = end.weight-final.weight-f.fuelresid,#2 negative
+            # value both are -0.1, due to inaccurate measurement at burning exp
+            char = round(char, 1), 
             curate = d.fresh/t.fresh, #curing rate
             ldratio = (t.fresh-d.fresh)/d.fresh, # live to dead fuel ratio
-            photo.ratio = m.leaf/m.nleaf) #lead to non-leaf tissue ratio
+            leafpcnt = m.leaf/(m.leaf+m.nleaf)) #leaf mass percentage
 
-## netefsb1, netefsb5, pava2sb2 and pava2fsb3 had negative post-burn fmc, most likely 
-## is due to inaccurate fresh mass measurements at the burn scene as I checked
-# for the dry mass measurement it's correct. So I may insert average fmc value for these
-# samples. 
-ave.postfmc <- fmc.mratio %>% filter(post.fmc >= 0) %>% group_by(spcode, light) %>%
-  summarize (ave.postfmc = mean(post.fmc, trim = 0, na.rm = TRUE)) %>%
-  mutate(label = paste(spcode, light, sep=""))
-#assign average post-burn fmc 
-fmc.mratio$post.fmc[which(fmc.mratio$label=="netefsb1")] <- ave.postfmc$ave.postfmc[which(ave.postfmc$label=="netefs")]
-fmc.mratio$post.fmc[which(fmc.mratio$label=="netefsb5")] <- fmc.mratio$post.fmc[which(fmc.mratio$label=="netefsb1")]
-fmc.mratio$post.fmc[which(fmc.mratio$label=="pava2sb2")] <- ave.postfmc$ave.postfmc[which(ave.postfmc$label=="pava2s")]
-fmc.mratio$post.fmc[which(fmc.mratio$label=="pava2fsb3")] <- ave.postfmc$ave.postfmc[which(ave.postfmc$label=="pava2fs")]
+## pocofsb3 and arpu9sb3 had negative char value, which likely
+## is due to inaccurate measurements of (end.weight, final weight or f.fuelresid) 
+## at the burn scene. Hoever, the value is small, both are -0.1, so I'll assign
+## 0 to char for pocofsb3 and arpu9sb3
 
+#assign 0 to char for the two -0.1 values 
+fmc.mratio$char[which(fmc.mratio$label=="pocofsb3")] <- 0
+fmc.mratio$char[which(fmc.mratio$label=="arpu9sb3")] <- 0
+
+fmc.mratio <- fmc.mratio %>% mutate(t.fuelresid = leftfuel + char) %>% 
+  select(-char, -leftfuel)
 ## SLA and SA:V ratio calculation
 wleaf_sum <- wleaf %>% group_by (spcode, light, block, treatment, rep) %>%
   mutate(sla = round(area/mass, 2)) %>%
@@ -142,14 +144,73 @@ vol.sum <- bind_rows(sum1, sum2, sum3, sum4)
 grasstraits <- leaftrait.sum %>% left_join(vol.sum, by = c("spcode", "light",
                                                            "block")) %>% 
   left_join(fmc.mratio, by = c("spcode", "light", "block")) %>%
-  left_join(modrank, by = "spcode")
+  left_join(massgain.sp, by = "spcode")
 
 #join trials
-trait.trial <- grasstraits %>% left_join(trials, by = c("label", "spcode", "light",
-                                                        "block"))
+trait.trial <- grasstraits %>% left_join(trials, by = c("label", "spcode", "light","block")) %>% 
+  mutate(above.drym = round(tfresh.mass/(pre.fmc + 1), 1), 
+         combust.mass = above.drym - t.fuelresid) #18 negative values
+## trying 2 different solutions to reduce negative combust.mass value
+## assumption: post.fmc is sampled with larger sample size, especially for 
+## samples didn't burn well, should be more accurate than pre.fmc given
+## difference in sample size
+
+trait.trial$pre.fmc2 <- NA
+trait.trial$pre.fmc3 <- NA
+ 
+#pre.fmc2: replace pre.fmc with post.fmc where combust biomass is negative
+
+  for (i in 1:length(trait.trial$combust.mass)){
+    if(!is.na(trait.trial$combust.mass[i])){
+      if(trait.trial$combust.mass[i]<0) {
+        trait.trial$pre.fmc2[i] <- trait.trial$post.fmc[i]
+      }
+      else{trait.trial$pre.fmc2[i] <- trait.trial$pre.fmc[i]}
+    }
+    else{trait.trial$pre.fmc2[i] <- trait.trial$pre.fmc[i]}
+  }
+
+#calculate combust biomass using the replaced pre.fmc
+trait.trial <- trait.trial %>% mutate(above.drym2 = round(tfresh.mass/(pre.fmc + 1), 1),
+                                      combust.mass2 = above.drym2 - t.fuelresid)
+
+#pre.fmc3: replace pre.fmc with post.fmc when it is lower than post.fmc
+
+for (i in 1:length(trait.trial$pre.fmc)){
+  if(!is.na(trait.trial$pre.fmc[i])){
+    if (!is.na(trait.trial$post.fmc[i])){
+      if(trait.trial$pre.fmc[i]<trait.trial$post.fmc[i]) {
+        trait.trial$pre.fmc3[i] <- trait.trial$post.fmc[i]
+      }
+      else{(trait.trial$pre.fmc3[i] <- trait.trial$pre.fmc[i])}
+    }
+   else{trait.trial$pre.fmc3[i] <- trait.trial$pre.fmc[i]}
+  }
+}
+
+#calculate combust biomass using the replaced pre.fmc
+trait.trial <- trait.trial %>% mutate(above.drym2 = round(tfresh.mass/(pre.fmc2 + 1), 1),
+                                      combust.mass2 = above.drym2 - t.fuelresid,
+                                      above.drym3 = round(tfresh.mass/(pre.fmc3 + 1), 1),
+                                      combust.mass3 = above.drym3 - t.fuelresid)
+## replace pre.fmc with post.fmc when combust.mass is negative is better
+## gonna use above.drym2 and combust.mass2 for later analysis
+
+#use above.drym2 to calculate mass density and leaf mass (total mass*leafpcnt)
+trait.trial <- trait.trial %>% mutate(bulkden = round(above.drym2/ave.tvol, 6),
+                                      leafmass = above.drym2*leafpcnt)
+
+#plot to see how these estimated combust biomass differ
+plot(trait.trial$combust.mass, type="p", col="blue")
+par(new=TRUE)
+plot(trait.trial$combust.mass2, type="p", col="red", ylab="", yaxt = "n")
+#par(new=TRUE)
+#plot(trait.trial$combust.mass3, type="p", col="black", ylab="", yaxt="n")
+
+
 ## clean env
 rm("case1", "case2", "case3", "sum1", "sum2", "sum3", "sum4", "nleaf_sum",
-   "wleaf_sum", "ave.postfmc", "catiller", "catiller.open", "grasstraits", "vol.sum",
+   "wleaf_sum", "catiller", "catiller.open", "grasstraits", "vol.sum",
    "leaftrait", "leaftrait.sum", "fmc.mratio", "nleaf", "wleaf")
 
 
