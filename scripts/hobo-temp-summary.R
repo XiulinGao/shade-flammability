@@ -69,10 +69,10 @@ threshold.a=60 # temperature threshold in degrees C
 threshold.b=100
 
 tempsec.sum <- thermocouples.long %>% group_by(label, location) %>%
-  summarise(dur.a = sum(temperature > threshold.a),
-            dur.b = sum(temperature > threshold.b),
-            degsec.a = sum(temperature[temperature > threshold.a]),
-            degsec.b = sum(temperature[temperature > threshold.b]),
+  summarise(dur.60 = sum(temperature > threshold.a),
+            dur.100 = sum(temperature > threshold.b),
+            degsec.60 = sum(temperature[temperature > threshold.a]),
+            degsec.100 = sum(temperature[temperature > threshold.b]),
             peak.temp = max(temperature, na.rm=TRUE),
             peak.time = time[which(peak.temp == temperature)[1]],
             num.NA = sum(is.na(temperature)))
