@@ -15,7 +15,7 @@ loadfonts()
 ## library(ggthemr)
 
 
-schwilkcolors <- c("#D68D18", "#836B43", "#A0AE6A", "#437683", "#18B0D6")
+schwilkcolors <- c("#A0AE6A", "#836B43", "#D68D18", "#437683", "#18B0D6")
 color25 <- c(
   "dodgerblue2", "#E31A1C", # red
   "green4",

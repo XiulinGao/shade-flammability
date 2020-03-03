@@ -197,7 +197,8 @@ trait.trial <- trait.trial %>% mutate(above.drym2 = round(tfresh.mass/(pre.fmc2 
 ## gonna use above.drym2 and combust.mass2 for later analysis
 
 #use above.drym2 to calculate mass density and leaf mass (total mass*leafpcnt)
-trait.trial <- trait.trial %>% mutate(bulkden = round(above.drym2/ave.tvol, 6),
+trait.trial <- trait.trial %>% mutate(bulkden = round(above.drym/ave.tvol, 6),
+                                      bulkden2 = round(above.drym2/ave.tvol, 6),
                                       leafmass = above.drym2*leafpcnt)
 
 #plot to see how these estimated combust biomass differ
@@ -210,7 +211,7 @@ plot(trait.trial$combust.mass2, type="p", col="red", ylab="", yaxt = "n")
 
 ## clean env
 rm("case1", "case2", "case3", "sum1", "sum2", "sum3", "sum4", "nleaf_sum",
-   "wleaf_sum", "catiller", "catiller.open", "grasstraits", "vol.sum",
+   "wleaf_sum", "grasstraits", "vol.sum",
    "leaftrait", "leaftrait.sum", "fmc.mratio", "nleaf", "wleaf")
 
 

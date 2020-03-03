@@ -2,6 +2,9 @@
 ## for temperature and relative humidity data measured on each burning day
 
 library(dplyr)
+library(lubridate)
+
+source("./burning-trial-summary.R")
 
 TZ = "CST6CDT"
 
@@ -24,6 +27,9 @@ concat_hobo_files <- function(filelist){
 
 hobo_weadata <- concat_hobo_files(list.files("../data/t_h",
                                      full.names=TRUE, pattern="*T_H"))
+#convert temp into celcius 
+hobo_weadata <- hobo_weadata %>% mutate(temp = (temp-32) * 5/9) %>% 
+  mutate(temp = round(temp, 2))
 
 ## read data from file produced by ibutton
 ib_weadata <- read.csv("../data/t_h/0329T.csv", skip=19)
@@ -34,6 +40,23 @@ ib_weadata <- ib_weadata %>% select(datet, temp) %>%
 
 ## bind two data files
 weadata <- bind_rows(ib_weadata, hobo_weadata) %>%
-  filter(!is.na(temp)) # filter out row where there is no logged data 
+  filter(!is.na(temp)) %>% # filter out row where there is no logged data 
+  mutate(trial.date = as.Date(datet, tz=TZ, format = "%Y-%m-%d"))
+
+## extrac temperatures that measured during each burning trial
+
+get_trial_label <- function(time) {
+  matches <- time %within% trials$interval
+  if(! any(matches)) return(NA)
+  return(trials$label[which.max(matches)])
+}
+
+# assign labels
+weadata$label <- unlist(sapply(weadata$datet, get_trial_label))
+burn_weather <- filter (weadata, !is.na(label))
+
+#average temperature measurements for each trial
+burn_weather <- burn_weather %>% group_by(label) %>% summarize(weatemp = round(mean(temp), 2))
+
 
 
