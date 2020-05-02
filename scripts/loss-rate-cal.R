@@ -24,15 +24,15 @@ balance_data <- balance_data %>% group_by (label) %>%
 #label <- unique(balance_data$label)
 
 #for (i in 1:length(label)) {
-#  plabel <- label[i]
-# subdata <- filter(balance_data, label == plabel)
-#  flaming <- filter(subdata, is.flaming)
-#  pdf(file.path("../results", file=paste(plabel, ".pdf", sep=""))) # plot in pdf
-#  pdf(file.path("../results", file=paste(plabel, "flaming", ".pdf", sep="")))
-#  print(qplot(diff_time, weight, data=subdata, geom="point") + 
-#          geom_vline(xintercept = subdata$septime[1]))
-#  print(qplot(diff_time, weight, data = flaming, geom="point"))
-#  dev.off() 
+  #plabel <- label[i]
+  #subdata <- filter(balance_data, label == plabel)
+  #flaming <- filter(subdata, is.flaming)
+  #pdf(file.path("../results", file=paste(plabel, ".pdf", sep=""))) # plot in pdf
+  #pdf(file.path("../results", file=paste(plabel, "flaming", ".pdf", sep="")))
+ # print(qplot(diff_time, weight, data=subdata, geom="point") + 
+          #geom_vline(xintercept = subdata$septime[1]))
+  #print(qplot(diff_time, weight, data = flaming, geom="point"))
+  #dev.off() 
 #}
 
 ## fit a mass decay model to entire balance and flaming only data (both linear and 
@@ -110,8 +110,8 @@ for (i in 1:length(decayID)){
     
 decayNLModsCoef_sig <- decayNLModsCoef %>% filter(term=="b", estimate<0) %>%
   filter(p.value < 0.05) 
-flamNLModsCoef_sig <- flamNLModsCoef %>% filter(term=="d", estimate<0) %>%
-  filter(p.value < 0.05)
+flamNLModsCoef_sig <- flamNLModsCoef %>% filter(term=="d", estimate<0) 
+#%>%filter(p.value < 0.05)
 
 ggplot(decayNLModsCoef_sig, aes(spcode, estimate)) + geom_point()
 ggplot(flamNLModsCoef_sig, aes(spcode, estimate)) + geom_point()
@@ -148,5 +148,3 @@ rm("decayID", "i", "subdecay", "mod_coef", "subflam",
    "flam_coef", "flamNLMod", "flamID", "flammods",
    "flamingLMods", "decayNLMod", "decayNLModsCoef", "flamingLMcoef",
    "flamNLModsCoef", "flam.bytrial", "bytrial")
-  
-
