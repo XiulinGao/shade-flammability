@@ -14,8 +14,8 @@ for (i in 1:len){
     d$heat50[i] <- NA}
 }
 
-#a typo in max.flam entry, need to fix 
-d$max.flam <- as.numeric(d$max.flam)
+#character entry in ignition converted the entire column to character
+# need to convert to numeric 
 d$ignition <- as.numeric(d$ignition)
 
 d1 <- d %>% filter(!is.na(ignition)) %>%  #remove two rows where all obs are NA due to 
