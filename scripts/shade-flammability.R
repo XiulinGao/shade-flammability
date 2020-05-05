@@ -24,8 +24,7 @@ pairs(cor.df)
 
 #rescale all independent variables and log transform dependent variable
 zscore <- function(x) (x - mean(x, na.rm=TRUE)) / sd(x, na.rm = TRUE) 
-flamdt <- flamdt %>% mutate_at(c("st", "above.drym", "pre.fmc", "ave.sla", "bulkden",
-                                 "ave.sav"),
+flamdt <- flamdt %>% mutate_at(c("st", "above.drym", "pre.fmc", "ave.sla", "bulkden"),
                                funs(s = zscore))
 
 #shade tolerance and soil heating mod
