@@ -4,8 +4,7 @@ library(dplyr)
 library(ggplot2)
 library(stringr)
 library(lubridate)
-#options(digits.secs=3)  ## DWS: ooh, I do not like this setting of global
-                        ## options. Why is this necessary?
+#options(digits.secs=3) 
 
 BALANCE_DATA_DIR <- "../data/balance"
 
