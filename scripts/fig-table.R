@@ -13,6 +13,9 @@ set.seed(100)
 col1 = 13.2
 col2 = 7
 ptsize = 3.5
+y0_breaks = c(exp(3), exp(5), exp(7))
+y50_breaks = c(exp(2.5), exp(5), exp(7.5))
+
 RESULTS <- "../results/"
 #textsize <- 20
 #axissz <- textsize-2
@@ -59,17 +62,21 @@ spmean <- left_join(spmean, spst, by = "spcode")
 #specify the order of shade tolerance group
 flamdt$stgroup <- factor(flamdt$stgroup, levels = c("High", "Moderate", "Low"))
 
-ggplot(flamdt, aes(above.drym, heatb_log, color = stgroup)) +
+ggplot(flamdt, aes(above.drym, heatb, color = stgroup)) +
   geom_point(size = ptsize-1.5, alpha = 0.5) + 
-  geom_point(data = spmean, aes(above.drym, heatb_log, color = stgroup), size = ptsize) + 
+  geom_point(data = spmean, aes(above.drym, heatb, color = stgroup), size = ptsize) + 
   facet_grid(.~light, labeller = labeller(light = lightlable)) +
   geom_smooth(data = spmean, method = "lm", se=FALSE, size = 0.8, color = 'black',) +
   #geom_abline(data = ref, aes(slope = slope, intercept = intcpt)) +
   #geom_errorbarh(aes(xmin=above.drym-above.drym_sd, xmax=above.drym+above.drym_sd), 
   #position = "identity", linetype = 1) + 
   scale_color_manual(values = schwilkcolors) +
+  scale_y_continuous(trans = "log",
+                     breaks = y0_breaks,
+                     #labels = label_number()) +
+                     labels = trans_format("log", math_format(e^.x))) + 
   xlab("Aboveground biomass (g)") +
-  ylab("Log-transformed heat release at soil surface") +
+  ylab("Heat release at soil surface (J)") +
   guides(color = guide_legend(label.theme = element_text(family=fontfamily, 
                                                          size=smsize,face = "plain")))+
   pubtheme.nogridlines + theme(legend.title = element_blank(),
@@ -88,21 +95,26 @@ print(tab1base.coef, type = "html", file = file.path(RESULTS, "base-st-coef.html
 
 #Fig.3 shade tolerance-50cm heating 
 
-ggplot(flamdt, aes(above.drym, heat50_log, color = stgroup)) +
+ggplot(flamdt, aes(above.drym, heat50, color = stgroup)) +
   geom_point(alpha = 0.5, size = ptsize-1.5) + 
   facet_grid(.~light, labeller = labeller(light = lightlable)) + #scales = "free_x") +
-  geom_point(data = spmean, aes(above.drym, heat50_log, color = stgroup), size = ptsize) + 
+  geom_point(data = spmean, aes(above.drym, heat50, color = stgroup), size = ptsize) + 
   geom_smooth(data = spmean, method = "lm", se=FALSE, size = 0.8)  +
   #geom_errorbar(data = spmean, aes(ymin = heat50_log-heat50_log_sd, 
   #ymax = heat50_log+heat50_log_sd), width = 0.1)+
   #scale_shape_manual(values = ptshape) + 
   scale_color_manual(values = schwilkcolors) + 
-  xlab("Aboveground biomass (g)") + ylab("Log-transformed heat release at 50cm") + 
+  scale_y_continuous(trans = "log",
+                     breaks = y50_breaks,
+                     #labels = label_number()) +
+                     labels = trans_format("log", math_format(e^.x)))+
+  xlab("Aboveground biomass (g)") + ylab("Heat release at 50cm (J)") + 
   pubtheme.nogridlines + 
   guides(color = guide_legend(label.theme = element_text(family=fontfamily, 
-                                                         size=smsize,face = "plain")))+
+                                            size=smsize,face = "plain")))+
   theme(legend.title = element_blank(), 
         legend.position = c(0.3, 0.2))
+
 ggsave("../results/fig3.pdf", width = col1, height= 0.7*col1, 
        units="cm")
 
@@ -139,11 +151,13 @@ tab2survi.coef <- xtable(survi.coef, digits = 4)
 
 
 #Fig.5 Predicted post-fire percentage biomass recovery 
-sjPlot::plot_model(resp_lmmod, type="pred", 
+
+sjPlot::plot_model(resp_lmmod, type="pred",
                    terms = c("heatb_s", "pre_tinum_s"),
                    colors = schwilkcolors,
-                   legend.title = "Standardized tiller num.") +
-  pubtheme.nogridlines + 
+                   legend.title = "Standardized tiller num.")+
+  pubtheme.nogridlines +
+  scale_y_continuous(labels = math_format(e^.x))+
   xlab("Standardized heat release at soil surface") + 
   ylab("Predicted post-fire biomass recovery(%)") +
   guides(color = guide_legend(title.position = "bottom",
@@ -185,46 +199,26 @@ predheat <- flamdt %>% select(label, spcode, light, block, ave.sla, pre.fmc, bul
                               above.drym, weatemp, above.drym_s, pre.fmc_s, ave.sla_s, 
                               bulkden_s, weatemp_s, stgroup)
 predheat$heatb_log <- predict(traitsoil_mod, newdata = predheat)
+predheat <- predheat %>% mutate(heatb = exp(heatb_log)) %>% 
+  mutate(heatb = round(heatb, 2))
 
 #attach fmc and sla group to predict value
 spfmc <- flamdt %>% group_by(spcode) %>% summarise(fmcgroup = fmcgroup[1]) 
 spsla <- flamdt %>% group_by(spcode) %>% summarise(slagroup = slagroup[1]) 
 predheat <- predheat %>% left_join(spfmc, by = "spcode") %>% left_join(spsla, by = "spcode")
 
-#fig.a: biomass and fmc main effects
-#ggplot(flamdt, aes(above.drym, heatb_log, color = fmcgroup)) + 
-  #geom_point(aes(shape = short.name), size = 2.5, stroke = 0.8) + 
-  #geom_smooth(method = "lm", se=FALSE, size = 0.8) + 
-  #scale_shape_manual(values = ptshape) +
-  #scale_color_manual(values = schwilkcolors, breaks = c("Low", "High"), labels = fmclabel) +
-  #xlab("Aboveground biomass (g)") + ylab("Heat release at soil surface") +
-  #guides(color = guide_legend(label.theme = element_text(family=fontfamily, 
-                                                         #size=smsize,face = "plain"))) + 
-  #pubtheme.nogridlines + theme(legend.title = element_blank(),
-                               #legend.position = "bottom") 
-#ggsave("../results/base-trait.pdf", width = col1, height= 0.7*col1, 
-       #units="cm") 
-
-#fig.b: fmc and sla interaction effect
-#ggplot(flamdt, aes(pre.fmc, heatb_log)) + 
-  #geom_point(aes(shape = short.name), size = 2.5, stroke = 0.8) +
-  #geom_smooth(method = "lm", se=FALSE, size = 0.8, color = "black") +
-  #scale_shape_manual(values = ptshape) +
-  #facet_grid(.~slagroup, scales = "free_x", labeller = labeller(slagroup = slalabel)) +
-  #xlab("Fuel moisture content") + ylab("Heat release at soil surface") +
-  #pubtheme.nogridlines + theme(legend.title = element_blank(),
-                               #legend.position = "bottom") 
-#ggsave("../results/base-slafmc.pdf", width = col1, height= 0.7*col1, 
-       #units="cm") 
-
-#or combine into one figure
-ggplot(flamdt, aes(above.drym, heatb_log, color = fmcgroup)) + 
+ggplot(flamdt, aes(above.drym, heatb, color = fmcgroup)) + 
   geom_point(size = ptsize) + 
-  geom_blank(data = predheat, aes(above.drym, heatb_log, color = fmcgroup)) +
+  geom_blank(data = predheat, aes(above.drym, heatb, color = fmcgroup)) +
   geom_smooth(data = predheat, method = "lm", se=FALSE, size = 0.8) + 
-  scale_color_manual(values = schwilkcolors[c(1, 3)], breaks = c("Low", "High"), labels = fmclabel) +
+  scale_y_continuous(trans = "log",
+                     breaks = y0_breaks,
+                     labels = trans_format("log", math_format(e^.x)))+
+  scale_color_manual(values = schwilkcolors[c(1, 3)], 
+                    breaks = c("High", "Low"), labels = fmclabel) +
   facet_grid(.~slagroup, labeller = labeller(slagroup = slalabel))+
-  xlab("Aboveground biomass (g)") + ylab("Log-transformed heat release at soil surface") +
+  xlab("Aboveground biomass (g)") + 
+  ylab("Heat release at soil surface (J)") +
   guides(color = guide_legend(label.theme = element_text(family=fontfamily, 
                                                          size=smsize,face = "plain"))) + 
   pubtheme.nogridlines + theme(legend.title = element_blank(),
@@ -246,13 +240,18 @@ print(traitb.coeftab, type = "html", file = file.path(RESULTS, "trait-soil-coef.
 
 #predict value for heat at 50cm from model
 predheat$heat50_log <- predict(trait50_mod, newdata = predheat)
+predheat <- predheat %>% mutate(heat50 = exp(heat50_log)) %>% 
+  mutate(heat50 = round(heat50, 2))
 
-ggplot(flamdt, aes(above.drym, heat50_log)) + #, color = stgroup)) + 
+ggplot(flamdt, aes(above.drym, heat50)) + #, color = stgroup)) + 
   geom_point(size = ptsize)+
   geom_smooth(data = predheat, method = "lm", se=FALSE, size = 0.8, color = 'black') +
   facet_grid(.~fmcgroup, labeller = labeller(fmcgroup = fmclabel)) +
+  scale_y_continuous(trans = "log",
+                     breaks = y50_breaks,
+                     labels = trans_format("log", math_format(e^.x)))+
   xlab("Aboveground biomass (g)") + 
-  ylab("Log-transformed heat release at 50cm") +
+  ylab("Heat release at 50cm (J)") +
   #scale_color_manual(values = schwilkcolors) +
   #guides(color = guide_legend(label.theme = element_text(family=fontfamily, 
                                                          #size=smsize,face = "plain"))) + 
@@ -270,7 +269,6 @@ trait50.coeftab <- xtable(trait50.coef, digits = 4)
 print(trait50.coeftab, type = "html", file = file.path(RESULTS, "trait-50-coef.html"))
 
 
-
 #Fig.8 plant traits, light environments, and live fuel moisture
 fmc.mean <- fmcdt %>% group_by(spcode, short.name, light) %>% 
   summarise(pre.fmc = mean(pre.fmc), ldratio = mean(ldratio))
@@ -286,8 +284,9 @@ ggplot(fmcdt, aes(ldratio, pre.fmc, color = slagroup)) +
   geom_point(size = ptsize) +
   facet_grid(.~light,labeller = labeller(light = lightlable)) + 
   geom_smooth(data = fmc.mean, method = "lm", se = FALSE, color = "black", size = 0.8)+
+  scale_y_continuous(labels = percent)+
   xlab("Live to dead mass ratio") + 
-  ylab("Pre-burn fuel moisture content(%)")+
+  ylab("Pre-burn fuel moisture content")+
   scale_color_manual(values = schwilkcolors, breaks = c("Low", "High"), labels = slalabel) +
   guides(color = guide_legend(label.theme = element_text(family=fontfamily, 
                                                          size=smsize,face = "plain"))) + 
