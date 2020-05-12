@@ -1,10 +1,38 @@
 ## all-data.R
-## script that source all required data for further analysis
-## runs before running analysis script
 
-source("./hobo-temp-summary.R") #need tempsec.sum for temperature summary
-source("./loss-rate-cal.R") #need flamNLModsCoef_sig for mass loss rate
-source("./plant-traits.R") #need trait.trial dataset for all plant traits and trial measurements
+## script that source all required data for further analysis runs before
+## running analysis script. This code is meant to be run only once and loads
+## all common packages needed.
+
+## Packages
+library(dplyr)
+library(lubridate)
+library(stringr)
+library(tidyr)
+library(ggplot2)
+library(lme4)
+library(broom)
+library(pcaMethods)
+library(car) # for Anova()
+
+## Other packages needed but not loaded via library():
+# corrplot ( for) corrplot::corrplot
+# ggpubr  # needed?
+# sjPlot
+# insight # for model_info ? needed. 
+
+## project wide settings:
+TZ = "CST6CDT"  # time zone
+RESULTS <- "../results/"  # directory for figures and tables
+
+# set the random number seed
+set.seed(-372)
+
+# read main data files
+source("./read-hobo.R") # need tempsec.sum for temperature summary
+source("./read-balance.R")  # read in raw balance data
+source("./read-traits.R") # need trait.trial dataset for all plant traits and trial measurements
+source("./read-weather.R") # get temperature data for each trial: burn_weather dataset
 
 # join all data to make a complete dataset where all info can be found
 alldata <- tempsec.sum %>% left_join(filter(trait.trial,treatment == "b"), by = "label") %>% 
@@ -34,3 +62,6 @@ flamdt <- alldata %>% select(-peak.temp, -dur.100, -degsec.100, -dur.60)
 flamdt <- spread(flamdt, location, degsec.60) 
 flamdt <- flamdt %>% mutate(heatb_log = log(heatb),
                             heat50_log = log(heat50))
+
+
+
