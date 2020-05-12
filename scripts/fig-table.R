@@ -1,7 +1,7 @@
 ##fig-table.R
 ## make all figures and tables for shade-flammability manuscript
-library(ggpubr)
-library(pcaMethods)
+#library(ggpubr) # needed for what? Does not seem to be used.
+library(pcaMethods) # must install via bioconductor
 library(xtable)
 
 source("./ggplot-theme.R")

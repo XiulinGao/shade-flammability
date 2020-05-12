@@ -56,8 +56,6 @@ fpca.loads
 # 3rd axis: lossrate
 # first 3 axes account for 89% total variance in the dataset. 
 
-flampca.scores <- as.data.frame(scores(flamPCA))
-
 ## measurements have large loadings on the first 4  axes: leafmass, above.drym2, 
 ## bulkden pre.fmc2, ave.sav and ave.sla, account for 85.3% total variance in the 
 ## data
