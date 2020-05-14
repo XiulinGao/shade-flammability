@@ -1,13 +1,24 @@
 # Read hobo data logger temperature data, split into sections by burn trial, and
 # summarize for each trial
-library(dplyr)
-library(lubridate)
-library(stringr)
-library(tidyr)
-library(ggplot2)
+
 
 #TZ = "CST6CDT"
-source("./burning-trial-summary.R")
+## clean up recorded trial data in burning-trial.csv. The main mission is to do
+## basic summary for each trial
+
+## Read trial data first
+
+trials <- read.csv("../data/burning-trial.csv", stringsAsFactors=FALSE,
+                   na.strings = c("", "N/A", "NA", "na", "n/a")) 
+trials <- trials %>% mutate(tfresh.mass = initial.weight-final.weight) %>%
+  mutate(start.time = mdy_hm(str_c(trial.date, " ",
+                                   start.time),tz=TZ)) %>%
+  mutate(end.time = mdy_hm(str_c(trial.date, " ", end.time), tz=TZ),
+         label = paste(spcode, light, block, sep="")) 
+
+trials$interval <- interval(trials$start.time, trials$end.time)
+
+
 
 read_hobo_file <- function(filename) {
   hobo <- read.csv(filename, skip=2, header=FALSE)
@@ -80,23 +91,23 @@ tempsec.sum <- thermocouples.long %>% group_by(label, location) %>%
 ## plot out temp summary to see how species burned in terms of flame temp
 
 # grab spcode from trials
-plotdf <- trials %>% select(c("spcode", "label", "light")) %>% 
-  right_join(tempsec.sum, by ="label")
+## plotdf <- trials %>% select(c("spcode", "label", "light")) %>% 
+##   right_join(tempsec.sum, by ="label")
 
-## degsec above 60
-ggplot(plotdf, aes(spcode, degsec.a, color = spcode)) + 
-  geom_jitter() + facet_grid(. ~ location) # by species and location
+## ## degsec above 60
+## ggplot(plotdf, aes(spcode, degsec.a, color = spcode)) + 
+##   geom_jitter() + facet_grid(. ~ location) # by species and location
 
-ggplot(plotdf, aes(spcode, degsec.a, color = light)) + geom_jitter() +
-  facet_grid(. ~ location) # by species, location and light treatment
+## ggplot(plotdf, aes(spcode, degsec.a, color = light)) + geom_jitter() +
+##   facet_grid(. ~ location) # by species, location and light treatment
 
-## degsec above 100
+## ## degsec above 100
 
-ggplot(plotdf, aes(spcode, degsec.b, color = spcode)) + 
-  geom_jitter() + facet_grid(. ~ location) # by species and location
+## ggplot(plotdf, aes(spcode, degsec.b, color = spcode)) + 
+##   geom_jitter() + facet_grid(. ~ location) # by species and location
 
-ggplot(plotdf, aes(spcode, degsec.b, color = light)) + geom_jitter() +
-  facet_grid(. ~ location) # by species, location and light treatment
+## ggplot(plotdf, aes(spcode, degsec.b, color = light)) + geom_jitter() +
+##   facet_grid(. ~ location) # by species, location and light treatment
 
 
 #clean up env

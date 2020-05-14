@@ -1,13 +1,6 @@
 ## script to read anc clean up hobo and i-button (20190329 burn) data 
 ## for temperature and relative humidity data measured on each burning day
 
-library(dplyr)
-library(lubridate)
-
-source("./burning-trial-summary.R")
-
-TZ = "CST6CDT"
-
 ## read weather data from files produced by hobo logger
 read_hobo_file <- function(filename) {
   hobo <- read.csv(filename, skip=3, header=FALSE)

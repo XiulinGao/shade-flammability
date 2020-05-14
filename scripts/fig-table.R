@@ -1,13 +1,10 @@
 ##fig-table.R
 ## make all figures and tables for shade-flammability manuscript
 library(ggpubr)
-library(pcaMethods)
 library(xtable)
 
+source("./analyses.R")
 source("./ggplot-theme.R")
-source("./post-fire-traits.R")
-source("./traits-flammability.R")
-set.seed(100)
 
 #ptshape <- c(0, 1, 2, 4, 5, 6, 7,8, 10, 12, 13, 14,15, 16, 17, 18, 20)
 col1 = 13.2
@@ -16,7 +13,7 @@ ptsize = 3.5
 y0_breaks = c(exp(3), exp(5), exp(7))
 y50_breaks = c(exp(2.5), exp(5), exp(7.5))
 
-RESULTS <- "../results/"
+
 #textsize <- 20
 #axissz <- textsize-2
 
@@ -85,9 +82,10 @@ ggplot(flamdt, aes(above.drym, heatb, color = stgroup)) +
 ggsave("../results/fig2.pdf", width = col1, height= 0.7*col1, 
        units="cm")
 
-#Table S2: mixed effect model coeffecient and anova table 
+#Table S2: mixed effect model coefficient and anova table 
 #for soil heating and shade tolerance
 tab1base.aov <- xtable(baseanova)
+
 print(tab1base.aov, type = "html", file = file.path(RESULTS, "base-st-aov.html"))
 basest.coef <- summary(baseheat_mod)$coefficients 
 tab1base.coef <- xtable(basest.coef, digits = 4)
@@ -167,8 +165,10 @@ sjPlot::plot_model(resp_lmmod, type="pred",
                                #legend.title = element_blank(),
                                legend.position = "right") 
 
-ggsave("../results/fig5.pdf", width = col1, height= 0.7*col1, 
+ggsave(file = file.path(RESULTS, "fig5.pdf"), width = col1, height= 0.7*col1,
        units="cm")
+
+## DWS: why do you sometimes use a RESULTS variable and sometimes hardcode the path?
 
 #Table S5: post fire biomass recovery model coefficients and anova table
 print(tab2survi.coef, type = "html", file = file.path(RESULTS, "survival-coef.html"))
@@ -224,10 +224,10 @@ ggplot(flamdt, aes(above.drym, heatb, color = fmcgroup)) +
   pubtheme.nogridlines + theme(legend.title = element_blank(),
                                legend.position = c(0.3, 0.2)) 
 
-ggsave("../results/fig6.pdf", width = col1, height= 0.7*col1, 
+ggsave(file = file.path(RESULTS, "fig6.pdf"), width = col1, height= 0.7*col1, 
        units="cm") 
 
-#Table S6: traits-soil heating model coeeficients and anova table
+# Table S6: traits-soil heating model coefficients and anova table
 traitb.aovtab <- xtable(traitsoilaov)
 print(traitb.aovtab, type = "html", file = file.path(RESULTS, "trait-soil-aov.html"))
 traitb.coef <- summary(traitsoil_mod)$coefficients
@@ -236,7 +236,7 @@ print(traitb.coeftab, type = "html", file = file.path(RESULTS, "trait-soil-coef.
 
 
 
-#Fig.7 plant traits-50cm heating 
+# Fig.7 plant traits-50cm heating 
 
 #predict value for heat at 50cm from model
 predheat$heat50_log <- predict(trait50_mod, newdata = predheat)
