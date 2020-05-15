@@ -24,7 +24,15 @@ pairs(cor.df)
 #rescale all independent variables and log transform dependent variable
 zscore <- function(x) (x - mean(x, na.rm=TRUE)) / sd(x, na.rm = TRUE) 
 flamdt <- flamdt %>% mutate_at(c("st", "above.drym", "pre.fmc", "ave.sla", "bulkden"),
-                               funs(s = zscore))
+                               list(s = zscore)) #funs() is depressed, use list()
+
+## because experiment methods influenced heat release at 50cm (see supplementary-
+## material-figs.R), need to throw away obs for heat50 from 3/29/19 trial date
+## for any analysis for heat50
+flam50 <- flamdt %>% filter(trial.date!="3/29/19") %>% 
+  mutate_at(c("st", "above.drym", "pre.fmc", "ave.sla", "bulkden"),
+            list(s = zscore)) 
+  
 
 #shade tolerance and soil heating mod
 baseheat_mod <- lmer(heatb_log ~ above.drym_s*st_s*light + (1|spcode), 
@@ -35,8 +43,9 @@ baseanova <- Anova(baseheat_mod, type ="3", test.statistic = "F")
 baseanova
 
 #shade tolrance and heat50 mod
+
 heat50_mod <- lmer(heat50_log ~ above.drym_s*st_s*light + (1|spcode), 
-                         flamdt, REML=TRUE)
+                         flam50, REML=TRUE)
 #plot(heat50_mod)
 summary(heat50_mod)
 heat50anova <- Anova(heat50_mod, type = "3", test.statistic = "F")
@@ -49,8 +58,12 @@ heat50anova
 ## determine how flammability varies in response to trait variations 
 ## traits: biomass, fmc, specific leaf area, and canopy trait
 
+#bind weather measurements to each trial
 flamdt <- flamdt %>% left_join(burn_weather, by="label")
+flam50 <- flam50 %>% left_join(burn_weather, by = "label")
+#z-score air temperature measurements
 flamdt <- flamdt %>% mutate(weatemp_s = zscore(weatemp))
+flam50 <- flam50 %>% mutate(weatemp_s = zscore(weatemp))
 
 ## mod 1: trait effects on soil heating ##
 traitsoil_mod <- lmer(heatb_log ~ above.drym_s*pre.fmc_s*ave.sla_s*bulkden_s +
@@ -63,13 +76,13 @@ traitsoilaov
 ##mod 2: trait effects on mid-camopy heating ##
 trait50_mod <- lmer(heat50_log~ above.drym_s*pre.fmc_s*ave.sla_s*bulkden_s +
                             weatemp_s - above.drym_s:pre.fmc_s:ave.sla_s:bulkden_s +
-                            (1|spcode), flamdt, REML=TRUE)
+                            (1|spcode), flam50, REML=TRUE)
 summary(trait50_mod)
 trait50aov <- Anova(trait50_mod, type="3", test.statistic = "F") 
 trait50aov
 
 # biomass positively influenced mid-canopy and soil heating, fmc negatively influenced 
-# mid-canopy and soil heating. 
+# mid-canopy and soil heating.biomass density negatively influenced mid-canopy heating
 # there is a positive interaction between fmc and sla on soil heating
 
 ## how fuel moisture content is related to live:dead biomass ratio, light, and 
@@ -119,9 +132,8 @@ colnames(survi_dt)[which(colnames(survi_dt)=="tiller.num")] <- "post_tinum"
 ###Grasses produce less heat at soil surface during fire also have higher survival ratee ###
 
 #rescale varibales
-zscore <- function(x) (x - mean(x, na.rm=TRUE)) / sd(x, na.rm = TRUE) 
 survi_dt <- survi_dt %>% mutate_at(c('pre_tinum', 'heatb', 'st', 'above.drym'), 
-                                   funs(s = zscore(.)))
+                                   list(s = zscore))
 
 ##model survival and resprouting strength separately using logistic and liner
 ## mixed effect model
@@ -137,8 +149,8 @@ survi.aov
 ##resprout strength linear mixed effect mod
 respdt <- filter(survi_dt, tmass.dry != 0) %>% # excluded individuals didn't resprout
   mutate(recover_pcnt = tmass.dry/above.drym) %>% 
-  mutate(log_pcntm = log(recover_pcnt))
-
+  mutate(log_pcntm = log(recover_pcnt)) #calculate percentage biomass recovered 
+                                        # and do log transformation
 resp_lmmod <- lmer(log_pcntm ~ heatb_s*pre_tinum_s*st_s + (1|spcode),
                     respdt, REML = TRUE)
 #plot(resp_lmmod) #check resid normality 
