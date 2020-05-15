@@ -6,6 +6,7 @@
 ## 50% shade in comparison with plants growing under full sun light
 
 library(broom.mixed)
+library(xtable)
 
 ###############################################################################
 ## Read biomass data
@@ -31,7 +32,7 @@ mass.gain <- left_join (fmass, ave.imass, by = "spcode")
 mass.gain <- mass.gain %>% group_by (spcode, treatment, block) %>%
   summarise (gmass = biomass - imass.ave)
 
-ggplot(mass.gain, aes(treatment, gmass)) + geom_boxplot() + facet_wrap(~spcode) 
+#ggplot(mass.gain, aes(treatment, gmass)) + geom_boxplot() + facet_wrap(~spcode) 
 #ggsave("../results/final-biomass.jpeg", width=col1, height= 0.9*col1)
 
 ## how do species response to shade differently in terms of biomass gain?
@@ -279,7 +280,15 @@ par(new=TRUE)
 plot(trait.trial$combust.mass2, type="p", col="red", ylab="", yaxt = "n")
 #par(new=TRUE)
 #plot(trait.trial$combust.mass3, type="p", col="black", ylab="", yaxt="n")
+#combust.mass and combust.mass2 readlly don't differ too much. 
+# decided to use above.drym and bulkden for all analysis later
 
+#delete bulkden2 and combust.mass2&3, above.drym3, pre.fmc2&3 for avoiding confusion
+# they are just different estimation for those variables trying to avoid negative
+# combust.mass estimation
+trait.trial <- trait.trial %>% select(-pre.fmc2, -pre.fmc3, -above.drym2,
+                                      -above.drym3, -combust.mass2, -combust.mass3,
+                                      -bulkden2)
 
 ## clean env
 rm("case1", "case2", "case3", "sum1", "sum2", "sum3", "sum4", "nleaf_sum",
