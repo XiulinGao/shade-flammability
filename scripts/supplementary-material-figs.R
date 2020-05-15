@@ -9,10 +9,14 @@ source("./all-data.R")
 source("./ggplot-theme.R")
 
 #Figure S2
-s1d <- alldata %>% select(spcode, label, short.name, light, trial.date, heat50, heatb, 
-                          bulkden)
+s1d <- alldata %>% select(spcode, label, short.name, light, trial.date, 
+                          heat50, heatb, ignition, combustion, lossrate) %>% 
+  mutate(lossrate = abs(lossrate))
+s1d$ignition <- as.numeric(s1d$ignition)
+
 s1d <- s1d[!duplicated(s1d), ] #delete duplicated rows
-s1d <- s1d %>%  mutate_at(c("heat50", "heatb"), ~log(.))
+s1d <- s1d %>%  mutate_at(c("heat50", "heatb", "ignition", "combustion",
+                            "lossrate"), ~log(.))
 trial1 <- s1d %>% filter(trial.date == "3/29/19") #data from 1st trial 
 trial1.sp <- unique(trial1$spcode) #species included in 1st trial
 s1d <- s1d %>% filter(spcode %in% trial1.sp) #only observations from those species 
@@ -29,7 +33,15 @@ mod1 <- lme4::lmer(heat50 ~ method*light + (1|spcode), s1d, REML= TRUE)
 car::Anova(mod1) #yes, method influenced heta50
 mod2 <- lme4::lmer(heatb ~ method*light + (1|spcode), s1d, REML = TRUE)
 car::Anova(mod2) #no, method did not influence heat release at soil surface
+mod3 <- lme4::lmer(ignition ~  method*light + (1|spcode), s1d, REML= TRUE)
+car::Anova(mod3)
+mod4 <- lme4::lmer(combustion ~  method*light + (1|spcode), s1d, REML= TRUE)
+car::Anova(mod4)
+mod5 <- lme4::lmer(lossrate ~  method*light + (1|spcode), s1d, REML= TRUE)
+car::Anova(mod5)
 
+##experiment methods only had influence on heat release at 50cm
+## so have to throw away measurements for heat50 from the first trial date
 #visualize the method effects
 lightlable <- c("0% shade", "50% shade")
 names(lightlable) <- c("fs", "s")
