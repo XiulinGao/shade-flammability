@@ -39,8 +39,7 @@ alldata <- tempsec.sum %>% left_join(filter(trait.trial,treatment == "b"), by = 
   left_join(flamNLModsCoef_sig, by = c("label", "spcode")) %>%
   select(-peak.time, -num.NA, -treatment, -wind, -interval, -start.time, -end.time,
          -term, -p.value, -end.weight, -final.weight, -f.fuelresid, -tfresh.mass, 
-         -initial.weight, -post.fmc, -t.fuelresid,  -above.drym3,
-         -combust.mass3, -pre.fmc3)
+         -initial.weight, -post.fmc, -t.fuelresid)
 
 alldata <- ungroup(alldata)
 # covert temp difference to heat
