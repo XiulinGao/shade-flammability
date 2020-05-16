@@ -245,13 +245,13 @@ print(traitb.coeftab, type = "html", file = file.path(RESULTS, "trait-soil-coef.
 
 # Fig.7 plant traits-50cm heating 
 #sjPlot::plot_model(trait50_mod, type = "pred", 
-                   #terms = c("pre.fmc_s", "bulkden_s")) +
+                   #terms = c("above.drym_s", "bulkden_s")) +
                  #pubtheme.nogridlines 
 
-#break bulkden into 2 groups: bulkden<0.001, and bulkden>0.0010
-flam50$dengroup <- sapply(flam50$bulkden, vabreak, value = c(0.0012))
+#break bulkden into 2 groups: bulkden<0.0013, and bulkden>0.0013
+flam50$dengroup <- sapply(flam50$bulkden, vabreak, value = c(0.0013))
 flam50$dengroup <- as.factor(flam50$dengroup)
-denlabel <- c("Bulk density < 0.0012g/cm^3", "Bulk density > 0.0012g/cm^3")
+denlabel <- c("Bulk density < 0.0013g/cm^3", "Bulk density > 0.0013g/cm^3")
 names(denlabel) <- c("Low", "High")
 
 #break fmc into 2 groups: fmc>40% and fmc < 40%
@@ -273,7 +273,7 @@ predheat50 <- predheat50 %>% left_join(fmc50, by = "spcode") %>%
 
 ggplot(flam50, aes(above.drym, heat50, color = dengroup)) + 
   geom_point(size = ptsize)+
-  geom_smooth(data = predheat50, method = "lm", se=FALSE, size = 0.8,color = 'black') +
+  geom_smooth(data = predheat50, method = "lm", se=FALSE, size = 0.8, color = "black") +
   facet_grid(.~fmcgroup, labeller = labeller(fmcgroup = fmclabel)) +
   scale_y_continuous(trans = "log",
                      breaks = y50_breaks,
