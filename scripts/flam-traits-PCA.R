@@ -1,11 +1,9 @@
 ## flam-traits-PCA.R
 ##script to do PCA on both plant traits and flammability measurements
-library(pcaMethods)
 source('./all-data.R')
-set.seed(100)
 
 ############## PCA of flammability and trait measurements ##############
-d <- flamdt 
+d <- flamdt      
 len <- length(d$heat50)
 #exclude heat50 from the first trial
 # as the observations are biased
@@ -19,10 +17,8 @@ for (i in 1:len){
 d$ignition <- as.numeric(d$ignition)
 
 d1 <- d %>% filter(!is.na(ignition)) %>%  #remove two rows where all obs are NA due to 
-  select(combustion, lossrate,       #failed ignition
-  heat50, heatb, ignition) %>% 
-  mutate(lossrate = abs(lossrate)) #%>% #all observations are not normal distribution
-  #mutate_if(is.numeric, log)           # log transformation or not?
+  select(combustion, lossrate, combust.mass,    #failed ignition
+  heat50, heatb, ignition) 
 
 d1 <- prep(d1, scale = "uv", center = TRUE) #z-score as obs at very diff scales
 
@@ -33,7 +29,7 @@ pairs(d1) #loss rate isn't linear related to any?? should it still be included?
 
 #PCA with imputation
 fppca <- d1 %>% 
-  pca(nPcs=5, method="ppca") #impute with probabilistic model, which can handle 10-15%
+  pca(nPcs=6, method="ppca") #impute with probabilistic model, which can handle 10-15%
                              # data missing
 
 summary(fppca)
@@ -43,11 +39,12 @@ fppca.loads
 
 #PCA without imputation
 d2 <- d %>% filter(!is.na(lossrate)) %>% filter(!is.na(heat50)) %>% 
-  select(combustion, lossrate,       #remove all NAs
+  filter(!is.na(combust.mass)) %>% 
+  select(combustion, lossrate, combust.mass,      #remove all NAs
          heat50, heatb, ignition) 
 
 d2 <- prep(d2, scale = "uv", center = TRUE)
-fpca <- d2 %>% pca(nPcs = 5, method = "svd")
+fpca <- d2 %>% pca(nPcs = 6, method = "svd")
 summary(fpca)
 fpca.loads <- as.data.frame(loadings(fpca))
 fpca.loads
