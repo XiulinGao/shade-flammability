@@ -1,11 +1,7 @@
 #supplementary-material-figs.R
 # r script for making figures for supplementary materials
-library(dplyr)
-library(ggplot2)
-library(pcaMethods)
-set.seed(100)
 
-source("./all-data.R")
+source("./flam-traits-PCA.R")
 source("./ggplot-theme.R")
 
 #Figure S2
@@ -77,19 +73,13 @@ ggsave("../results/S3.pdf", width = col1, height= 0.7*col1,
        units="cm")
 
 # Figure S4
-d <- flamdt %>% select(lossrate, ignition, combust.mass,
-                       combustion, heat50, heatb) 
-d$ignition <- as.numeric(d$ignition) #ignition entry has character, which are failed
-                                     # ignitions mared as "F"
-flamPCA <- d %>% filter(!is.na(ignition)) %>% 
-  pca(nPcs=6, method="ppca", center=TRUE,scale="uv")
 
-summary(flamPCA)
-flampca.loads <- as.data.frame(loadings(flamPCA))
+summary(fppca)
+flampca.loads <- as.data.frame(loadings(fppca))
 flampca.loads
-flampca.scores <- as.data.frame(scores(flamPCA))
-var.name <- c("lossrate", "ignition", "mass loss",
-              "combustion", "heat50", "heat0")
+flampca.scores <- as.data.frame(scores(fppca))
+var.name <- c("combustion", "lossrate", "mass loss", 
+              "heat50", "heat0", "ignition")
 
 get_ratio <- function(pcscores, pcloads) {
   # get the ratio for PC1-PC2 biplot
@@ -113,20 +103,21 @@ flampca.loads <- transform(flampca.loads,
 ## text
 text.cor <- flampca.loads %>% select(v1, v2)
 
-text.cor$v2[1] <- text.cor$v2[1] + 0.4
-text.cor$v1[2] <- text.cor$v1[2] + 0.1
+text.cor$v2[1] <- text.cor$v2[1] + 0.3
+text.cor$v2[2] <- text.cor$v2[2] + 0.4
 text.cor$v2[3] <- text.cor$v2[3] - 0.2
-text.cor$v2[4] <- text.cor$v2[4] + 0.1
-text.cor$v2[5] <- text.cor$v2[5] - 0.1
-text.cor$v2[6] <- text.cor$v2[6] + 0.3
+text.cor$v1[3] <- text.cor$v1[3] + 0.5
+text.cor$v2[4] <- text.cor$v2[4] - 0.3
+text.cor$v2[5] <- text.cor$v2[5] + 0.4
+text.cor$v1[6] <- text.cor$v1[6] + 0.1
 
 
 ggplot() +
-  geom_point(data = flampca.scores, aes(x=PC1, y=PC2)) +
+  geom_point(data = flampca.scores, aes(x=PC1, y=PC2), alpha = 0.5) +
   geom_segment(data = flampca.loads, aes(x = 0, y = 0, xend = v1, yend = v2),
                arrow = arrow(length= unit(0.2, "cm")), alpha = 0.75)+
   geom_text(data = text.cor, aes(x=v1, y=v2, label=var.name),
-            size = 3.5, vjust=0.5, hjust="inward", color="black") +
+            size = 3, vjust=0.5, hjust="inward", color="black") +
   xlab("Principal component 1 (48.1%)") +
   ylab("Principal component 2 (18.1%)") +
   pubtheme.nogridlines + theme(legend.position = "none",
