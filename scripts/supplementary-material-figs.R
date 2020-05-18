@@ -30,41 +30,41 @@ s1d$method <- sapply(s1d$trial.date, group_method)
 
 #model examine if observations were influenced by methods
 mod1 <- lme4::lmer(heat50 ~ method*light + (1|spcode), s1d, REML= TRUE)
-car::Anova(mod1) #yes, method influenced heta50
+Anova(mod1, test.statistic = "F") #yes, method influenced heta50
 mod2 <- lme4::lmer(heatb ~ method*light + (1|spcode), s1d, REML = TRUE)
-car::Anova(mod2) #no, method did not influence heat release at soil surface
+Anova(mod2, test.statistic = "F") #no, method did not influence heat release at soil surface
 mod3 <- lme4::lmer(ignition ~  method*light + (1|spcode), s1d, REML= TRUE)
-car::Anova(mod3)
+Anova(mod3, test.statistic = "F")
 mod4 <- lme4::lmer(combustion ~  method*light + (1|spcode), s1d, REML= TRUE)
-car::Anova(mod4)
+Anova(mod4, test.statistic = "F")
 mod5 <- lme4::lmer(lossrate ~  method*light + (1|spcode), s1d, REML= TRUE)
-car::Anova(mod5)
+Anova(mod5, test.statistic = "F")
 
 ##experiment methods only had influence on heat release at 50cm
 ## so have to throw away measurements for heat50 from the first trial date
 #visualize the method effects
-lightlable <- c("0% shade", "50% shade")
-names(lightlable) <- c("fs", "s")
+#lightlable <- c("0% shade", "50% shade")
+#names(lightlable) <- c("fs", "s")
 
-ggplot(s1d, aes(spcode, heat50)) + geom_point() +
-  geom_point(data = trial1, aes(spcode, heat50), color = "red") +
-  facet_grid(light ~., labeller = labeller(light = lightlable)) + 
-  xlab("Species") +
-  ylab("Heat release at 50cm (J)") +
-  pubtheme.nogridlines
-ggsave("../results/S2-1.pdf", width = col1, height= 0.7*col1, 
-       units="cm")
+#ggplot(s1d, aes(spcode, heat50)) + geom_point() +
+  #geom_point(data = trial1, aes(spcode, heat50), color = "red") +
+  #facet_grid(light ~., labeller = labeller(light = lightlable)) + 
+  #xlab("Species") +
+  #ylab("Heat release at 50cm in log-scale (J)") +
+  #pubtheme.nogridlines
+#ggsave("../results/S2-1.pdf", width = col1, height= 0.7*col1, 
+       #units="cm")
 
-ggplot(s1d, aes(spcode, heatb))+ geom_point() +
-  geom_point(data = trial1, aes(spcode, heatb), color = "red") +
-  facet_grid(light ~., labeller = labeller(light = lightlable)) + 
-  xlab("Species") +
-  ylab("Heat release at soil surface (J)") +
-  pubtheme.nogridlines
-ggsave("../results/S2-2.pdf", width = col1, height= 0.7*col1, 
-       units="cm")
+#ggplot(s1d, aes(spcode, heatb))+ geom_point() +
+#  geom_point(data = trial1, aes(spcode, heatb), color = "red") +
+  #facet_grid(light ~., labeller = labeller(light = lightlable)) + 
+  #xlab("Species") +
+  #ylab("Heat release at soil surface in log-scale (J)") +
+  #pubtheme.nogridlines
+#ggsave("../results/S2-2.pdf", width = col1, height= 0.7*col1, 
+       #units="cm")
 
-#Figure S4
+#Figure S3
 sample <- balance_data %>% filter(label == "ante2fsb1") %>% 
   filter(is.flaming) %>% 
   mutate(diff_time = diff_time - 50) # example data from one of the trials
@@ -73,22 +73,23 @@ ggplot(sample, aes(diff_time, weight)) + geom_point() +
   xlab("Time since ignition (s)") +
   ylab("Remained mass (g)") + 
   pubtheme.nogridlines
-ggsave("../results/S4.pdf", width = col1, height= 0.7*col1, 
+ggsave("../results/S3.pdf", width = col1, height= 0.7*col1, 
        units="cm")
 
-# Figure S5
-d <- flamdt %>% select(lossrate, ignition, 
+# Figure S4
+d <- flamdt %>% select(lossrate, ignition, combust.mass,
                        combustion, heat50, heatb) 
 d$ignition <- as.numeric(d$ignition) #ignition entry has character, which are failed
                                      # ignitions mared as "F"
 flamPCA <- d %>% filter(!is.na(ignition)) %>% 
-  pca(nPcs=5, method="ppca", center=TRUE,scale="uv")
+  pca(nPcs=6, method="ppca", center=TRUE,scale="uv")
 
 summary(flamPCA)
 flampca.loads <- as.data.frame(loadings(flamPCA))
 flampca.loads
 flampca.scores <- as.data.frame(scores(flamPCA))
-var.name <- c("lossrate", "ignition", "combustion", "heat50", "heat0")
+var.name <- c("lossrate", "ignition", "mass loss",
+              "combustion", "heat50", "heat0")
 
 get_ratio <- function(pcscores, pcloads) {
   # get the ratio for PC1-PC2 biplot
@@ -112,11 +113,12 @@ flampca.loads <- transform(flampca.loads,
 ## text
 text.cor <- flampca.loads %>% select(v1, v2)
 
-text.cor$v2[1] <- text.cor$v2[1] - 0.3
+text.cor$v2[1] <- text.cor$v2[1] + 0.4
 text.cor$v1[2] <- text.cor$v1[2] + 0.1
-text.cor$v2[3] <- text.cor$v2[3] - 0.1
-text.cor$v1[4] <- text.cor$v1[4] - 0.25
-text.cor$v2[5] <- text.cor$v2[5] - 0.4
+text.cor$v2[3] <- text.cor$v2[3] - 0.2
+text.cor$v2[4] <- text.cor$v2[4] + 0.1
+text.cor$v2[5] <- text.cor$v2[5] - 0.1
+text.cor$v2[6] <- text.cor$v2[6] + 0.3
 
 
 ggplot() +
@@ -125,12 +127,12 @@ ggplot() +
                arrow = arrow(length= unit(0.2, "cm")), alpha = 0.75)+
   geom_text(data = text.cor, aes(x=v1, y=v2, label=var.name),
             size = 3.5, vjust=0.5, hjust="inward", color="black") +
-  xlab("Principal component 1 (40.9%)") +
-  ylab("Principal component 2 (21.8%)") +
+  xlab("Principal component 1 (48.1%)") +
+  ylab("Principal component 2 (18.1%)") +
   pubtheme.nogridlines + theme(legend.position = "none",
                                axis.title = element_blank())
 
-ggsave("../results/S5.pdf", width = col1, height= 0.7*col1, 
+ggsave("../results/S4.pdf", width = col1, height= 0.7*col1, 
        units="cm")
 
   
