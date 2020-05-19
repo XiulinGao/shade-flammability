@@ -41,10 +41,9 @@ textsize <- 10
 smsize <- textsize-2
 pt2mm <- 0.35146
 smsize.mm <- smsize*pt2mm
-fontfamily = "Times"
+fontfamily = "Times"  #  DWS; Check. I suspect Arial is preferred by publisher. Sna serif for legends, usually
 col2 <- 18.4 # cm
 col1 <- 8.9 # cm #according to http://fireecologyjournal.org/how-to-submit/
-col3 <- 14
 
 pubtheme   <-  theme_grey() +
              theme(axis.title.y = element_text(family=fontfamily,
@@ -59,8 +58,9 @@ pubtheme   <-  theme_grey() +
                strip.text.y = element_text(family=fontfamily, size = textsize), #, face="italic"),
            #   strip.background = element_blank(),
                legend.title = element_text(family=fontfamily, size=textsize),
-               legend.text = element_text(family=fontfamily, size=smsize, face="italic"),
+               legend.text = element_text(family=fontfamily, size=smsize),
                legend.key = element_rect(fill=NA),
+               legend.background = element_rect(fill="transparent"),
                panel.grid.major = element_line(colour = "grey90", size = 0.2),
                panel.grid.minor = element_line(colour = "grey95", size =0.5),
            #    panel.grid.minor = element_blank(),
@@ -92,7 +92,7 @@ prestheme   <- theme(axis.title.y = element_text(family=fontfamily,
                strip.text.y = element_text(family=fontfamily, size = prestxsz),#, face="italic"),
            #   strip.background = element_blank(),
                legend.title = element_text(family=fontfamily, size=pressmsz),
-               legend.text = element_text(family=fontfamily, size=pressmsz, face="italic"),
+               legend.text = element_text(family=fontfamily, size=pressmsz),
                legend.key = element_rect(fill=NA),
                legend.key.height = unit(0.5, "lines"),
                legend.background = element_rect(fill="transparent"),

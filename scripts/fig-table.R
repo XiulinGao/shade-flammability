@@ -5,18 +5,19 @@ source("./analyses.R")
 source("./ggplot-theme.R")
 
 #ptshape <- c(0, 1, 2, 4, 5, 6, 7,8, 10, 12, 13, 14,15, 16, 17, 18, 20)
-col1 = 13.2
-col2 = 7
-ptsize = 3.5
+## col1 = 13.2
+## col2 = 7  # This makes no sense! a 2 column figure needs to be at least 2x as wide as a 1 col figure. Check submission requirements.
+## ptsize = 3.5
+
+## DWS: why the below ?
 y0_breaks = c(exp(3), exp(5), exp(7))
 y50_breaks = c(exp(2.5), exp(5), exp(7.5))
 
+# textsize <- 20
+# axissz <- textsize-2
 
-#textsize <- 20
-#axissz <- textsize-2
-
-#calculate mean of each measurement, mean of heat50 need to be calculated by 
-#excluding measurements from 03/29/19
+# calculate mean of each measurement, mean of heat50 need to be calculated by
+# excluding measurements from 03/29/19
 spmean <- flamdt %>% group_by(spcode, short.name, light) %>% 
   summarise_at(c("st", "combust.mass", "base", "height.100",
                  "heat50", "heatb", "combustion", "ave.sla", "ave.sav",
