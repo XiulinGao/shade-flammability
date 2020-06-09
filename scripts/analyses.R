@@ -32,7 +32,9 @@ flamdt <- flamdt %>% mutate_at(c("st", "above.drym", "pre.fmc", "ave.sla", "bulk
 flam50 <- flamdt %>% filter(trial.date!="3/29/19") %>% 
   mutate_at(c("st", "above.drym", "pre.fmc", "ave.sla", "bulkden"),
             list(s = zscore)) 
-  
+
+## DWS: ah, I have found the source of this object! MY nemesis! Why do this?
+## This seems like a sledgehammer approach.
 
 #shade tolerance and soil heating mod
 baseheat_mod <- lmer(heatb_log ~ above.drym_s*st_s*light + (1|spcode), 
