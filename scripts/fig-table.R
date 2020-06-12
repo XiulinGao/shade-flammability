@@ -101,7 +101,7 @@ fig2.spmean <- spmean %>% select(spcode, short.name,light, stgroup, above.drym, 
 
 ## Fig 2 approach 1, as facets)
 
-fig2 <- ggplot(fig2.data, aes(above.drym, heat, color = stgroup)) +
+fig2 <- ggplot(fig2.flamdt, aes(above.drym, heat, color = stgroup)) +
   geom_point(alpha = 0.5, size = ptsize-1.5) + 
   facet_grid(height ~ light, labeller = labeller(light = lightlabel, height=heightlabel)) + #scales = "free_x") +
   geom_point(data = fig2.spmean, aes(above.drym, heat, color = stgroup), size = ptsize) + 
@@ -128,7 +128,7 @@ ggsave(file.path(RESULTS, "fig2_approach1.pdf"), plot=fig2,
 
 fig2a <- ggplot(subset(fig2.flamdt, height=="50"), aes(above.drym, heat, color = stgroup)) +
   geom_point(alpha = 0.5, size = ptsize-1.5) + 
-  facet_grid(.~light, labeller = labeller(light = lightlable)) + #scales = "free_x") +
+  facet_grid(.~light, labeller = labeller(light = lightlabel)) + #scales = "free_x") +
   geom_point(data = subset(fig2.spmean, height=="50"), size = ptsize) + 
   geom_smooth(data = subset(fig2.spmean, height=="50"), method = "lm", se=FALSE, size = 0.8)  +
   #geom_errorbar(data = spmean, aes(ymin = heat50_log-heat50_log_sd, 
@@ -153,7 +153,7 @@ fig2b <- ggplot(subset(fig2.flamdt, height=="b"), aes(above.drym, heat, color = 
   geom_point(size = ptsize-1.5, alpha = 0.5) + 
   geom_point(data = subset(fig2.spmean, height=="b"), size = ptsize) + 
   geom_smooth(data = subset(fig2.spmean, height=="b"), method = "lm", se=FALSE, size = 0.8, color = 'black') +
-  facet_grid(.~light, labeller = labeller(light = lightlable)) +
+  facet_grid(.~light, labeller = labeller(light = lightlabel)) +
   #geom_abline(data = ref, aes(slope = slope, intercept = intcpt)) +
   #geom_errorbarh(aes(xmin=above.drym-above.drym_sd, xmax=above.drym+above.drym_sd), 
   #position = "identity", linetype = 1) + 
