@@ -33,7 +33,7 @@ mutate_cond <- function(.data, condition, ..., envir = parent.frame()) {
 # Just replace those values with NA
 
 flamdt <- mutate_cond(flamdt, trial.date=="3/29/19", t50.ini = NA, t50.flam = NA, t50.smol = NA,
-                      diff50=NA, heat50=NA)
+                      diff50=NA, heat50=NA, heat50_log=NA)
 
 cor.df <- flamdt %>% select(heatb,heat50, 
                             ave.sla, ave.sav,bulkden, 
@@ -68,7 +68,7 @@ heat50anova <- Anova(heat50_mod, type = "3", test.statistic = "F")
 heat50anova
 
 ## There are sig. negative effects of shade tolerance on 
-## mid-canopy heating. In addition
+## mid-canopy heating. 
 
 ## traits-flammability
 ## determine how flammability varies in response to trait variations 
