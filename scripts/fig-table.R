@@ -3,11 +3,11 @@
 
 source("./analyses.R")
 source("./ggplot-theme.R")
-
+#library(patchwork)
 #ptshape <- c(0, 1, 2, 4, 5, 6, 7,8, 10, 12, 13, 14,15, 16, 17, 18, 20)
 ## col1 = 13.2
 ## col2 = 7  # This makes no sense! a 2 column figure needs to be at least 2x as wide as a 1 col figure. Check submission requirements.
-## ptsize = 3.5
+ptsize = 3.5
 
 ## DWS: why the below ?
 y0_breaks = c(exp(3), exp(5), exp(7))
@@ -24,20 +24,27 @@ spmean <- flamdt %>% group_by(spcode, short.name, light) %>%
                  "pre.fmc", "above.drym", "bulkden"), 
                list(~mean(., na.rm=TRUE), ~sd(., na.rm=TRUE)))
 
-mean50 <- flam50 %>% group_by(spcode, short.name, light) %>% 
-summarise(heat50_mean2 = mean(heat50, na.rm=TRUE),
-          heat50_sd2 = sd(heat50, na.rm = TRUE))
+## mean50 <- flam50 %>% group_by(spcode, short.name, light) %>% 
+## summarise(heat50_mean2 = mean(heat50, na.rm=TRUE),
+##           heat50_sd2 = sd(heat50, na.rm = TRUE))
 
 # Use heat50_mean calculated without obs from first trial
-spmean <- spmean %>% left_join(mean50, by = c("spcode", "short.name", "light")) %>% 
-  select(-heat50_mean, -heat50_sd)
+## spmean <- spmean %>% left_join(mean50, by = c("spcode", "short.name", "light")) %>% 
+##   select(-heat50_mean, -heat50_sd)
 
-# Rename columns 
-colnames(spmean)[c(4:14, 26:27)] <- c("st", "combust.mass", "base", "height.100", 
-                            "heatb",  "combustion", 
-                            "ave.sla", "ave.sav", "pre.fmc", "above.drym", "bulkden",
-                            "heat50", "heat50_sd")
+## DWS: Check that this works now. If there are numbers that are bad (eg one
+## trial date) then take those out FIRST before anything else is done.
 
+# Rename columns
+## DWS: DANGEROUS don't hard code column positions. Certinaly not this late in
+## the analyses
+
+## colnames(spmean)[c(4:14, 26:27)] <- c("st", "combust.mass", "base", "height.100", 
+##                             "heatb",  "combustion", 
+##                             "ave.sla", "ave.sav", "pre.fmc", "above.drym", "bulkden",
+##                             "heat50", "heat50_sd")
+
+names(spmean) <- str_replace(names(spmean), "_mean", "")
 
 ###############################################################################
 ## Table S1: Species means 
@@ -47,13 +54,17 @@ print(spmean_tab, type = "html",
       file=file.path(RESULTS, "va_mean.html"), include.rownames=FALSE)
 
 ###############################################################################
-## Fig. 2: shade tolerance-soil heating 
+## Fig. 2: heat release by biomass by shade treatment and shade tolerance
 ###############################################################################
 
-lightlable <- c("0% shade", "50% shade")
-names(lightlable) <- c("fs", "s")
+lightlabel <- c("0% shade", "50% shade")
+names(lightlabel) <- c("fs", "s")
 
-# break shade tolerance into 3 groups. Xiulin wants oragne to be "low" and that
+heightlabel <- c("At soil surface", "At 50 cm height")
+names(heightlabel) <- c("b", "50")
+
+
+# break shade tolerance into 3 groups. Xiulin wants orange to be "low" and that
 # makes sense for "shade tolerance", so we should make a specaial color set for
 # the shade tolerance factor.
 shade_factor_colors <- c("#D68D18",  "#836B43", "#A0AE6A")
@@ -61,39 +72,117 @@ shadelabels <- c("Low", "Moderate", "High")
 flamdt <- flamdt %>% mutate(stgroup = cut(st_s,
                                           breaks = c(-Inf, -0.7, 0.3, Inf),
                                           labels = shadelabels))
-flam50 <- flam50 %>% mutate(stgroup = cut(st_s,
-                                          breaks = c(-Inf, -0.7, 0.3, Inf),
-                                          labels = shadelabels))
+## flam50 <- flam50 %>% mutate(stgroup = cut(st_s,
+##                                           breaks = c(-Inf, -0.7, 0.3, Inf),
+##                                           labels = shadelabels))
 ## DWS: why are the different heights in different files? I disagree with that
 ## design choice. Keep data together and unduplicated.
 
 # Add grouped shade tolerance to species mean
 spst <- flamdt %>% group_by(spcode) %>% summarise(stgroup = stgroup[1]) 
-spmean <- left_join(spmean, spst, by = "spcode")
+spmean <- left_join(spmean, spst)# , by = "spcode")
 
-fig2 <- ggplot(flamdt, aes(above.drym, heatb, color = stgroup)) +
+
+## DWS: TODO the lines need to be from the mixed model.
+
+## first pivot the data longer
+fig2.flamdt <- flamdt %>% select(spcode, short.name, light, stgroup, above.drym, heatb, heat50) %>%
+  tidyr::pivot_longer(cols = starts_with("heat"),
+                      names_to = "height",
+                      names_prefix = "heat",
+                      values_to = "heat" )
+
+fig2.spmean <- spmean %>% select(spcode, short.name,light, stgroup, above.drym, heatb, heat50) %>%
+    tidyr::pivot_longer(cols = starts_with("heat"),
+                      names_to = "height",
+                      names_prefix = "heat",
+                      values_to = "heat" )
+
+
+## Fig 2 approach 1, as facets)
+
+fig2 <- ggplot(fig2.data, aes(above.drym, heat, color = stgroup)) +
+  geom_point(alpha = 0.5, size = ptsize-1.5) + 
+  facet_grid(height ~ light, labeller = labeller(light = lightlabel, height=heightlabel)) + #scales = "free_x") +
+  geom_point(data = fig2.spmean, aes(above.drym, heat, color = stgroup), size = ptsize) + 
+  geom_smooth(data = fig2.spmean, method = "lm", se=FALSE, size = 0.8)  +
+  #geom_errorbar(data = spmean, aes(ymin = heat50_log-heat50_log_sd, 
+  #ymax = heat50_log+heat50_log_sd), width = 0.1)+
+  #scale_shape_manual(values = ptshape) + 
+  scale_color_manual(values = shade_factor_colors) + 
+  scale_y_continuous("Heat release at (J)",
+                     trans = "log10") +
+                     #breaks = y50_breaks,
+                     #labels = label_number()) +
+  #labels = trans_format("log", math_format(e^.x)))+
+  scale_x_continuous("Above ground biomass (g)", limits=c(0,40)) +
+  pubtheme.nogridlines + 
+  guides(color = guide_legend(label.theme = element_text(family=fontfamily, 
+                                                         size=smsize,face = "plain"))) +
+  theme(legend.title = element_blank(),
+        legend.position = c(0.89, 0.2))
+fig2
+ggsave(file.path(RESULTS, "fig2_approach1.pdf"), plot=fig2,
+       width=col2, height=col1*2, unit="cm")
+## Approach 2 using patchwork
+
+fig2a <- ggplot(subset(fig2.flamdt, height=="50"), aes(above.drym, heat, color = stgroup)) +
+  geom_point(alpha = 0.5, size = ptsize-1.5) + 
+  facet_grid(.~light, labeller = labeller(light = lightlable)) + #scales = "free_x") +
+  geom_point(data = subset(fig2.spmean, height=="50"), size = ptsize) + 
+  geom_smooth(data = subset(fig2.spmean, height=="50"), method = "lm", se=FALSE, size = 0.8)  +
+  #geom_errorbar(data = spmean, aes(ymin = heat50_log-heat50_log_sd, 
+  #ymax = heat50_log+heat50_log_sd), width = 0.1)+
+  #scale_shape_manual(values = ptshape) + 
+  scale_color_manual(values = shade_factor_colors) + 
+  scale_y_continuous("Heat release at 50cm (J)",
+                     trans = "log10") +
+                     #breaks = y50_breaks,
+                     #labels = label_number()) +
+  #labels = trans_format("log", math_format(e^.x)))+
+  scale_x_continuous(limits=c(0,40)) +
+  pubtheme.nogridlines + 
+  guides(color = guide_legend(label.theme = element_text(family=fontfamily, 
+                                                         size=smsize,face = "plain"))) +
+  theme(legend.title = element_blank(),
+        #legend.position = c(0.89, 0.2),
+        axis.title.x = element_blank())
+fig2a
+
+fig2b <- ggplot(subset(fig2.flamdt, height=="b"), aes(above.drym, heat, color = stgroup)) +
   geom_point(size = ptsize-1.5, alpha = 0.5) + 
-  geom_point(data = spmean, aes(above.drym, heatb, color = stgroup), size = ptsize) + 
+  geom_point(data = subset(fig2.spmean, height=="b"), size = ptsize) + 
+  geom_smooth(data = subset(fig2.spmean, height=="b"), method = "lm", se=FALSE, size = 0.8, color = 'black') +
   facet_grid(.~light, labeller = labeller(light = lightlable)) +
-  geom_smooth(data = spmean, method = "lm", se=FALSE, size = 0.8, color = 'black') +
   #geom_abline(data = ref, aes(slope = slope, intercept = intcpt)) +
   #geom_errorbarh(aes(xmin=above.drym-above.drym_sd, xmax=above.drym+above.drym_sd), 
   #position = "identity", linetype = 1) + 
   scale_color_manual(values = shade_factor_colors) +
-  scale_y_continuous(trans = "log",
-                     breaks = y0_breaks,
+  scale_y_continuous("Heat release at soil surface (J)",
+                     trans = "log10") +
+#                     breaks = y0_breaks,
                      #labels = label_number()) +
-                     labels = trans_format("log", math_format(e^.x))) + 
-  xlab("Aboveground biomass (g)") +
-  ylab("Heat release at soil surface (J)") +
+  #                     labels = trans_format("log", math_format(e^.x))) +
+  scale_x_continuous("Aboveground biomass (g)", limits=c(0,40)) +
 #  guides(color = guide_legend(label.theme = element_text(family=fontfamily, 
 #                                                         size=smsize,face = "plain")))+
-  pubtheme.nogridlines + theme(legend.title = element_blank(),
-                               legend.position = c(0.89, 0.2))
-fig2
-## DWS: I think this needs to be a 2-column figure.
-ggsave(fig2, file = file.path(RESULTS, "fig2.pdf"), width = col2, height=col1, 
-       units="cm")
+  pubtheme.nogridlines +
+theme(legend.title = element_blank(),
+      strip.text.x=element_blank())
+  #      legend.position = c(0.89, 0.2))
+fig2b
+
+
+fig2_approach2 <- fig2a + fig2b +
+plot_layout(ncol = 1) +
+  plot_annotation(tag_levels = 'A') &
+  theme(plot.margin = unit(c(4, 4, 4, 4), "pt"),
+        plot.tag.position = c(0, 1),
+        plot.tag = element_text(hjust = -0.5, vjust = 0.3))
+
+fig2_approach2
+ggsave(file.path(RESULTS, "fig2_approach2.pdf"), plot=fig2_approach2,
+       width=col2, height=col1*2, unit="cm")
 
 ###############################################################################
 ## Table S2: mixed effect model coefficient and anova table
@@ -107,35 +196,6 @@ tab1base.coef <- xtable(basest.coef, digits = 4)
 print(tab1base.coef, type = "html", file = file.path(RESULTS, "base-st-coef.html"))
 
 
-###############################################################################
-## Fig. 3: shade tolerance-50cm heating
-###############################################################################
-## This should all be one file!
-
-## DWS: TODO the lines need to be from the mixed model.
-
-fig3 <- ggplot(flam50, aes(above.drym, heat50, color = stgroup)) +
-  geom_point(alpha = 0.5, size = ptsize-1.5) + 
-  facet_grid(.~light, labeller = labeller(light = lightlable)) + #scales = "free_x") +
-  geom_point(data = spmean, aes(above.drym, heat50, color = stgroup), size = ptsize) + 
-  geom_smooth(data = spmean, method = "lm", se=FALSE, size = 0.8)  +
-  #geom_errorbar(data = spmean, aes(ymin = heat50_log-heat50_log_sd, 
-  #ymax = heat50_log+heat50_log_sd), width = 0.1)+
-  #scale_shape_manual(values = ptshape) + 
-  scale_color_manual(values = shade_factor_colors) + 
-  scale_y_continuous(trans = "log",
-                     breaks = y50_breaks,
-                     #labels = label_number()) +
-                     labels = trans_format("log", math_format(e^.x)))+
-  xlab("Aboveground biomass (g)") + ylab("Heat release at 50cm (J)") + 
-  pubtheme.nogridlines + 
-  guides(color = guide_legend(label.theme = element_text(family=fontfamily, 
-                                                         size=smsize,face = "plain"))) +
-  theme(legend.title = element_blank(), 
-        legend.position = c(0.89, 0.2))
-fig3
-ggsave(fig3, file = file.path(RESULTS, "fig3.pdf"), width = col2, height= col1, 
-       units="cm")
 
 ###############################################################################
 ## Table S3: coeffecient and anova table for shade tolerance-50cm heating model

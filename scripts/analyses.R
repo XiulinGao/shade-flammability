@@ -9,7 +9,31 @@ source("./all-data.R") # run this once only
 options(contrasts = c("contr.sum", "contr.poly")) #type III anova table, set treatment contrast
 ## DWS: danger setting global options! Better to pass to the function.
 
+zscore <- function(x) (x - mean(x, na.rm=TRUE)) / sd(x, na.rm = TRUE) 
+
+## mutate_cond Create a simple function for data frames or data tables that can be
+## incorporated into pipelines. This function is like mutate but only acts on the
+## rows satisfying the condition. See  https://stackoverflow.com/questions/34096162/dplyr-mutate-replace-several-columns-on-a-subset-of-rows
+
+mutate_cond <- function(.data, condition, ..., envir = parent.frame()) {
+  condition <- eval(substitute(condition), .data, envir)
+  .data[condition, ] <- .data[condition, ] %>% mutate(...)
+  .data
+}
+
+
+
 #################### correlation matrix of flam&trait measurements ####################
+
+## because experiment methods influenced heat release at 50cm (see supplementary-
+## material-figs.R), need to throw away obs for heat50 from 3/29/19 trial date
+## for any analysis for heat50
+#flam50 <- flamdt %>% filter(trial.date!="3/29/19")
+
+# Just replace those values with NA
+
+flamdt <- mutate_cond(flamdt, trial.date=="3/29/19", t50.ini = NA, t50.flam = NA, t50.smol = NA,
+                      diff50=NA, heat50=NA)
 
 cor.df <- flamdt %>% select(heatb,heat50, 
                             ave.sla, ave.sav,bulkden, 
@@ -22,17 +46,9 @@ pairs(cor.df)
 ###### H: as shade tolerance increases, species flammability decrases ###### 
 
 #rescale all independent variables and log transform dependent variable
-zscore <- function(x) (x - mean(x, na.rm=TRUE)) / sd(x, na.rm = TRUE) 
 flamdt <- flamdt %>% mutate_at(c("st", "above.drym", "pre.fmc", "ave.sla", "bulkden"),
                                list(s = zscore)) #funs() is depressed, use list()
 
-## because experiment methods influenced heat release at 50cm (see supplementary-
-## material-figs.R), need to throw away obs for heat50 from 3/29/19 trial date
-## for any analysis for heat50
-flam50 <- flamdt %>% filter(trial.date!="3/29/19") %>% 
-  mutate_at(c("st", "above.drym", "pre.fmc", "ave.sla", "bulkden"),
-            list(s = zscore)) 
-  
 
 #shade tolerance and soil heating mod
 baseheat_mod <- lmer(heatb_log ~ above.drym_s*st_s*light + (1|spcode), 
@@ -45,7 +61,7 @@ baseanova
 #shade tolrance and heat50 mod
 
 heat50_mod <- lmer(heat50_log ~ above.drym_s*st_s*light + (1|spcode), 
-                         flam50, REML=TRUE)
+                         flamdt, REML=TRUE)
 #plot(heat50_mod)
 summary(heat50_mod)
 heat50anova <- Anova(heat50_mod, type = "3", test.statistic = "F")
@@ -60,10 +76,8 @@ heat50anova
 
 #bind weather measurements to each trial
 flamdt <- flamdt %>% left_join(burn_weather, by="label")
-flam50 <- flam50 %>% left_join(burn_weather, by = "label")
 #z-score air temperature measurements
 flamdt <- flamdt %>% mutate(weatemp_s = zscore(weatemp))
-flam50 <- flam50 %>% mutate(weatemp_s = zscore(weatemp))
 
 ## mod 1: trait effects on soil heating ##
 traitsoil_mod <- lmer(heatb_log ~ above.drym_s*pre.fmc_s*ave.sla_s*bulkden_s +
@@ -76,7 +90,7 @@ traitsoilaov
 ##mod 2: trait effects on mid-camopy heating ##
 trait50_mod <- lmer(heat50_log~ above.drym_s*pre.fmc_s*ave.sla_s*bulkden_s +
                             weatemp_s - above.drym_s:pre.fmc_s:ave.sla_s:bulkden_s +
-                            (1|spcode), flam50, REML=TRUE)
+                            (1|spcode), flamdt, REML=TRUE)
 summary(trait50_mod)
 trait50aov <- Anova(trait50_mod, type="3", test.statistic = "F") 
 trait50aov
@@ -112,6 +126,7 @@ pre_tinum2 <- catiller.open %>% group_by(label) %>% summarize(pre_tinum = tiller
                                                                                
 pre_tinum <- rbind(pre_tinum1, pre_tinum2)
 
+# DWS; Why is new data being read in? Put that in the read data scripts
 post_traits <- read.csv("../data/post-fire-traits.csv", stringsAsFactors=FALSE,
                         na.strings = c(""))
 #soilmc <- read.csv("../data/soil-moisture.csv", stringsAsFactors = FALSE, na.strings = c(""))
@@ -149,7 +164,7 @@ survi.aov
 ##resprout strength linear mixed effect mod
 respdt <- filter(survi_dt, tmass.dry != 0) %>% # excluded individuals didn't resprout
   mutate(recover_pcnt = tmass.dry/above.drym) %>% 
-  mutate(log_pcntm = log(recover_pcnt)) #calculate percentage biomass recovered 
+  mutate(log_pcntm = log10(recover_pcnt)) #calculate percentage biomass recovered 
                                         # and do log transformation
 resp_lmmod <- lmer(log_pcntm ~ heatb_s*pre_tinum_s*st_s + (1|spcode),
                     respdt, REML = TRUE)

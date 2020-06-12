@@ -59,8 +59,8 @@ colnames(alldata)[colnames(alldata)=="ave.gain"] <- "st"
 
 flamdt <- alldata %>% select(-peak.temp, -dur.100, -degsec.100, -dur.60) 
 flamdt <- spread(flamdt, location, degsec.60) 
-flamdt <- flamdt %>% mutate(heatb_log = log(heatb),
-                            heat50_log = log(heat50))
+flamdt <- flamdt %>% mutate(heatb_log = log10(heatb),
+                            heat50_log = log10(heat50))
 
 
 
