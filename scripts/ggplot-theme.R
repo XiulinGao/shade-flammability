@@ -17,7 +17,7 @@ textsize <- 10
 smsize <- textsize-2
 pt2mm <- 0.35146
 smsize.mm <- smsize*pt2mm
-fontfamily = "Arial"
+fontfamily = "ArialMT"
 col2 <- 18.4 # cm
 col1 <- 8.9 # cm #according to http://fireecologyjournal.org/how-to-submit/
 
