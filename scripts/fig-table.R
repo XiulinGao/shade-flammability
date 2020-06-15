@@ -124,15 +124,16 @@ ggsave(file.path(RESULTS, "fig2_approach1.pdf"), plot=fig2,
 ## get predictions of heat release for 2 data points (max. and min. of 
 ## standardized biomass) for each stgroup and light using mixed effect model
 
-fig2.pred <- flamdt %>% select(spcode, light, above.drym_s, st_s, above.drym, st, stgroup) %>% 
+fig2.fit <- flamdt %>% select(spcode, light, above.drym_s, st_s, above.drym, st, stgroup) %>% 
   filter(above.drym <=40) %>% #try to match the range of x of the main layer 
   group_by(light, stgroup) %>% 
   arrange(above.drym_s) %>% filter(above.drym_s %in% range(above.drym_s))
 ## max. and min. of aboveground biomass for each group
 
-fig2.pred$heat50_log <- predict(heat50_mod, newdata = fig2.pred) #does not account for random effects
-fig2.pred$heatb_log <- predict(baseheat_mod, newdata = fig2.pred)
-fig2.pred <- fig2.pred %>% mutate(heat50 = 10^(heat50_log),
+fig2.fit$heat50_log <- predict(heat50_mod, newdata = fig2.fit,
+                                      re.form = NA) #does not account for random effects
+fig2.fit$heatb_log <- predict(baseheat_mod, newdata = fig2.fit, re.form = NA)
+fig2.fit <- fig2.fit %>% mutate(heat50 = 10^(heat50_log),
                                   heatb = 10^(heatb_log)) %>% 
   select(-heat50_log, -heatb_log, -above.drym_s) %>% 
   tidyr::pivot_longer(cols = starts_with("heat"),
@@ -143,7 +144,7 @@ fig2.pred <- fig2.pred %>% mutate(heat50 = 10^(heat50_log),
 fig2a <- ggplot(subset(fig2.flamdt, height=="50"), aes(above.drym, heat, color = stgroup)) +
   geom_point(size = ptsize) + 
   facet_grid(.~light, labeller = labeller(light = lightlabel)) + #scales = "free_x") +
-  geom_line(aes(above.drym, heat, color = stgroup), subset(fig2.pred, height == "50"),
+  geom_line(aes(above.drym, heat, color = stgroup), subset(fig2.fit, height == "50"),
             size = 0.8) +
   #geom_point(data = subset(fig2.spmean, height=="50"), size = ptsize) + 
   #geom_smooth(data = subset(fig2.spmean, height=="50"), method = "lm", se=FALSE, size = 0.8)  +
@@ -161,7 +162,7 @@ fig2a
 
 fig2b <- ggplot(subset(fig2.flamdt, height=="b"), aes(above.drym, heat, color = stgroup)) +
   geom_point(size = ptsize) + 
-  geom_line(aes(above.drym, heat, color = stgroup), subset(fig2.pred, height =="b"), size = 0.8)+
+  geom_line(aes(above.drym, heat, color = stgroup), subset(fig2.fit, height =="b"), size = 0.8)+
   #geom_point(data = subset(fig2.spmean, height=="b"), size = ptsize) + 
   #geom_smooth(data = subset(fig2.spmean, height=="b"), method = "lm", se=FALSE, size = 0.8, color = "black") +
   facet_grid(.~light, labeller = labeller(light = lightlabel)) +
