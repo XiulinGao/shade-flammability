@@ -3,15 +3,11 @@
 
 source("./analyses.R")
 source("./ggplot-theme.R")
-#library(patchwork)
+library(patchwork)
 #ptshape <- c(0, 1, 2, 4, 5, 6, 7,8, 10, 12, 13, 14,15, 16, 17, 18, 20)
 ## col1 = 13.2
 ## col2 = 7  # This makes no sense! a 2 column figure needs to be at least 2x as wide as a 1 col figure. Check submission requirements.
 ptsize = 3.5
-
-## DWS: why the below ?
-y0_breaks = c(exp(3), exp(5), exp(7))
-y50_breaks = c(exp(2.5), exp(5), exp(7.5))
 
 # textsize <- 20
 # axissz <- textsize-2
@@ -19,9 +15,8 @@ y50_breaks = c(exp(2.5), exp(5), exp(7.5))
 # calculate mean of each measurement, mean of heat50 need to be calculated by
 # excluding measurements from 03/29/19
 spmean <- flamdt %>% group_by(spcode, short.name, light) %>% 
-  summarise_at(c("st", "combust.mass", "base", "height.100",
-                 "heat50", "heatb", "combustion", "ave.sla", "ave.sav",
-                 "pre.fmc", "above.drym", "bulkden"), 
+  summarise_at(c("st", "combust.mass", "heat50", "heatb", "combustion", "lossrate", "max.flam", 
+                 "ignition", "ave.sla", "pre.fmc", "above.drym", "bulkden"), 
                list(~mean(., na.rm=TRUE), ~sd(., na.rm=TRUE)))
 
 ## mean50 <- flam50 %>% group_by(spcode, short.name, light) %>% 
@@ -126,20 +121,35 @@ ggsave(file.path(RESULTS, "fig2_approach1.pdf"), plot=fig2,
        width=col2, height=col1*2, unit="cm")
 ## Approach 2 using patchwork
 
+## get predictions of heat release for 2 data points (max. and min. of 
+## standardized biomass) for each stgroup and light using mixed effect model
+
+fig2.pred <- flamdt %>% select(spcode, light, above.drym_s, st_s, above.drym, st, stgroup) %>% 
+  filter(above.drym <=40) %>% #try to match the range of x of the main layer 
+  group_by(light, stgroup) %>% 
+  arrange(above.drym_s) %>% filter(above.drym_s %in% range(above.drym_s))
+## max. and min. of aboveground biomass for each group
+
+fig2.pred$heat50_log <- predict(heat50_mod, newdata = fig2.pred) #does not account for random effects
+fig2.pred$heatb_log <- predict(baseheat_mod, newdata = fig2.pred)
+fig2.pred <- fig2.pred %>% mutate(heat50 = 10^(heat50_log),
+                                  heatb = 10^(heatb_log)) %>% 
+  select(-heat50_log, -heatb_log, -above.drym_s) %>% 
+  tidyr::pivot_longer(cols = starts_with("heat"),
+                      names_to = "height",
+                      names_prefix = "heat",
+                      values_to = "heat" )
+
 fig2a <- ggplot(subset(fig2.flamdt, height=="50"), aes(above.drym, heat, color = stgroup)) +
-  geom_point(alpha = 0.5, size = ptsize-1.5) + 
+  geom_point(size = ptsize) + 
   facet_grid(.~light, labeller = labeller(light = lightlabel)) + #scales = "free_x") +
-  geom_point(data = subset(fig2.spmean, height=="50"), size = ptsize) + 
-  geom_smooth(data = subset(fig2.spmean, height=="50"), method = "lm", se=FALSE, size = 0.8)  +
-  #geom_errorbar(data = spmean, aes(ymin = heat50_log-heat50_log_sd, 
-  #ymax = heat50_log+heat50_log_sd), width = 0.1)+
-  #scale_shape_manual(values = ptshape) + 
+  geom_line(aes(above.drym, heat, color = stgroup), subset(fig2.pred, height == "50"),
+            size = 0.8) +
+  #geom_point(data = subset(fig2.spmean, height=="50"), size = ptsize) + 
+  #geom_smooth(data = subset(fig2.spmean, height=="50"), method = "lm", se=FALSE, size = 0.8)  +
   scale_color_manual(values = shade_factor_colors) + 
   scale_y_continuous("Heat release at 50cm (J)",
                      trans = "log10") +
-                     #breaks = y50_breaks,
-                     #labels = label_number()) +
-  #labels = trans_format("log", math_format(e^.x)))+
   scale_x_continuous(limits=c(0,40)) +
   pubtheme.nogridlines + 
   guides(color = guide_legend(label.theme = element_text(family=fontfamily, 
@@ -150,9 +160,10 @@ fig2a <- ggplot(subset(fig2.flamdt, height=="50"), aes(above.drym, heat, color =
 fig2a
 
 fig2b <- ggplot(subset(fig2.flamdt, height=="b"), aes(above.drym, heat, color = stgroup)) +
-  geom_point(size = ptsize-1.5, alpha = 0.5) + 
-  geom_point(data = subset(fig2.spmean, height=="b"), size = ptsize) + 
-  geom_smooth(data = subset(fig2.spmean, height=="b"), method = "lm", se=FALSE, size = 0.8, color = 'black') +
+  geom_point(size = ptsize) + 
+  geom_line(aes(above.drym, heat, color = stgroup), subset(fig2.pred, height =="b"), size = 0.8)+
+  #geom_point(data = subset(fig2.spmean, height=="b"), size = ptsize) + 
+  #geom_smooth(data = subset(fig2.spmean, height=="b"), method = "lm", se=FALSE, size = 0.8, color = "black") +
   facet_grid(.~light, labeller = labeller(light = lightlabel)) +
   #geom_abline(data = ref, aes(slope = slope, intercept = intcpt)) +
   #geom_errorbarh(aes(xmin=above.drym-above.drym_sd, xmax=above.drym+above.drym_sd), 
