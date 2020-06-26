@@ -130,9 +130,9 @@ fig2.fit <- flamdt %>% select(spcode, light, above.drym_s, st_s, above.drym, st,
   arrange(above.drym_s) %>% filter(above.drym_s %in% range(above.drym_s))
 ## max. and min. of aboveground biomass for each group
 
-fig2.fit$heat50_log <- predict(heat50_mod, newdata = fig2.fit,
-                                      re.form = NA) #does not account for random effects
-fig2.fit$heatb_log <- predict(baseheat_mod, newdata = fig2.fit, re.form = NA)
+fig2.fit$heat50_log <- predict(heat50_mod, newdata = fig2.fit)
+                                      #re.form = NA) #does not account for random effects
+fig2.fit$heatb_log <- predict(baseheat_mod, newdata = fig2.fit) #, re.form = NA)
 fig2.fit <- fig2.fit %>% mutate(heat50 = 10^(heat50_log),
                                   heatb = 10^(heatb_log)) %>% 
   select(-heat50_log, -heatb_log, -above.drym_s) %>% 
@@ -219,10 +219,11 @@ tab150.coef <- xtable(st50.coef, digits = 4)
 print(tab150.coef, type = "html", file = file.path(RESULTS, "50-st-coef.html"))
 
 ###############################################################################
-## Fig. 4: Predicted post-fire survival rate 
+## Fig. 3: Predicted post-fire survival rate 
 ###############################################################################
 
-fig4 <- sjPlot::plot_model(survi_mod, type="pred", terms = c("heatb_s [all]"), se= FALSE)+
+fig3 <- sjPlot::plot_model(survi_mod, type="pred", terms = c("heatb_s [all]"), 
+                           ci.lvl = NA)+
   pubtheme.nogridlines +
   #guides(color = guide_legend(title.position = "bottom",
     #label.theme = element_text(family=fontfamily, 
@@ -232,13 +233,13 @@ fig4 <- sjPlot::plot_model(survi_mod, type="pred", terms = c("heatb_s [all]"), s
                                #legend.position = "right") +
   xlab("Standardized heat release at soil surface") + 
   ylab("Predicted survival rate")
-fig4
+fig3
 
-ggsave(fig4, file = file.path(RESULTS, "fig4.pdf"), width = col1 , height= 0.7*col1, 
+ggsave(fig3, file = file.path(RESULTS, "fig3.pdf"), width = col1 , height= 0.7*col1, 
        units="cm")
 
 ###############################################################################
-## Table S4: post fire rsyrvival rate model coefficients and anova table
+## Table S4: post fire survival rate model coefficients and anova table
 ###############################################################################
 
 tab2survi.aov <- xtable(survi.aov) 
@@ -247,13 +248,13 @@ survi.coef <- summary(survi_mod)$coefficients
 tab2survi.coef <- xtable(survi.coef, digits = 4)
 
 ###############################################################################
-# Fig. 5: Predicted post-fire percentage biomass recovery
+# Fig. 4: Predicted post-fire percentage biomass recovery
 ###############################################################################
 
-fig5 <- sjPlot::plot_model(resp_lmmod, type="pred",
+fig4 <- sjPlot::plot_model(resp_lmmod, type="pred",
                    terms = c("heatb_s", "pre_tinum_s"),
                    colors = schwilkcolors,
-                   legend.title = "Standardized\ntiller #")+
+                   legend.title = "Standardized\ntiller number", ci.lvl = NA)+
   pubtheme.nogridlines +
   scale_y_continuous(labels = math_format(e^.x))+
   xlab("Standardized heat release at soil surface") + 
@@ -261,8 +262,8 @@ fig5 <- sjPlot::plot_model(resp_lmmod, type="pred",
   pubtheme.nogridlines + theme(plot.title = element_blank(),
                                legend.position = "right") +
   theme(legend.position = c(0.2, 0.32))
-fig5
-ggsave(fig5, file = file.path(RESULTS, "fig5.pdf"), width = col1, height= 0.7*col1,
+fig4
+ggsave(fig4, file = file.path(RESULTS, "fig4.pdf"), width = col1, height= 0.7*col1,
        units="cm")
 
 ###############################################################################
@@ -277,46 +278,45 @@ tab2resp.coef <- xtable(resp.coef, digits = 4)
 print(tab2resp.coef, type = "html", file = file.path(RESULTS, "resprout-coef.html"))
 
 ###############################################################################
-## Fig. 6: plant traits-soil heating
+## Fig. 5: plant traits-soil heating
 ###############################################################################
 
 flamdt <- flamdt %>% mutate(slagroup = cut(ave.sla,
                                            breaks = c(-Inf, 300, Inf),
                                            labels =  c("SLA > 300~cm^2~g^{-1}",  "SLA < 300~cm^2~g^{-1}")),
                             fmcgroup = cut(pre.fmc, breaks=c(-Inf, 0.4, Inf),
-                                           labels = c("FMC < 40%", "FMC > 40%"))
+                                           labels = c("FMC < 40%", "FMC > 40%")),
+                            dengroup = cut(bulkden, c(-Inf, 0.0013, Inf),
+                                           labels =  c("Bulk~density < 0.0013~g~cm^{-3}", "Bulk~density > 0.0013~g~cm^{-3}"))
                             )
 # Predict value of soil heating from mixed effect model
-predheat <- flamdt %>% select(label, spcode, light, block, ave.sla, pre.fmc, bulkden,
-                              above.drym, weatemp, above.drym_s, pre.fmc_s, ave.sla_s, 
-                              bulkden_s, weatemp_s, stgroup)
-predheat$heatb_log <- predict(traitsoil_mod, newdata = predheat)
-predheat <- predheat %>% mutate(heatb = exp(heatb_log)) %>% 
-  mutate(heatb = round(heatb, 2))
+fig5.fit <- flamdt %>% select(spcode, light, slagroup, fmcgroup, above.drym, 
+                              pre.fmc, bulkden, ave.sla, weatemp, above.drym_s, 
+                              pre.fmc_s, bulkden_s, ave.sla_s, weatemp_s) %>% 
+  group_by(slagroup, fmcgroup) %>% 
+  arrange(above.drym_s) %>% filter(above.drym_s %in% range(above.drym_s)) %>% 
+  filter(spcode !="pava2") #within fmc<40% group ended up with two obs having the
+                           # same biomass, selecte the one having higher fmc
 
-## DWS: Why are you using natural log above? Is there are good reason? UNless there
-## is a strong reason to use natural log, I recommend log10.
+fig5.fit$heatb_log <- predict(traitsoil_mod, newdata = fig5.fit) #random effect considered
+fig5.fit <- fig5.fit %>% mutate(heatb = 10^(heatb_log)) %>% 
+  select(-heatb_log, -above.drym_s, -pre.fmc_s, -bulkden_s, -ave.sla_s, -weatemp_s)
 
-# attach fmc and sla group to predict value
-spfmc <- flamdt %>% group_by(spcode) %>% summarise(fmcgroup = fmcgroup[1]) 
-spsla <- flamdt %>% group_by(spcode) %>% summarise(slagroup = slagroup[1]) 
-predheat <- predheat %>% left_join(spfmc, by = "spcode") %>% left_join(spsla, by = "spcode")
-
-fig6 <- ggplot(flamdt, aes(above.drym, heatb, color = fmcgroup)) + 
-  geom_point(size = ptsize) + 
-  geom_blank(data = predheat, aes(above.drym, heatb, color = fmcgroup)) +
-  geom_smooth(data = predheat, method = "lm", se=FALSE, size = 0.8) + 
-  scale_y_continuous(trans = "log",
-                     breaks = y0_breaks,
-                     labels = trans_format("log", math_format(e^.x)))+
-  scale_color_manual(values = schwilkcolors[c(1, 3)]) +
-  facet_grid(.~slagroup, labeller = label_parsed) + # use label_parsed to allow expressions in legends
-  xlab("Aboveground biomass (g)") + 
-  ylab("Heat release at soil surface (J)") +
-  pubtheme.nogridlines + theme(legend.title = element_blank(),
-                               legend.position = c(0.88, 0.2)) 
-fig6
-ggsave(fig6, file = file.path(RESULTS, "fig6.pdf"), width = col2, height= col1, 
+fig5 <- ggplot(flamdt, aes(above.drym, heatb, color = fmcgroup)) + 
+  geom_point(size = ptsize, alpha = 0.8) + 
+  facet_grid(.~slagroup, labeller = label_parsed) +
+  geom_line(aes(above.drym, heatb, color = fmcgroup), fig5.fit, size = 0.8) +
+  scale_color_manual(values = schwilkcolors[c(3, 1)]) + 
+  scale_y_continuous("Heat release at soil surface (J)",
+                     trans = "log10") +
+  xlab("Aboveground biomass (g)") +
+  pubtheme.nogridlines + 
+  guides(color = guide_legend(label.theme = element_text(family=fontfamily, 
+                                                         size=smsize,face = "plain"))) +
+  theme(legend.title = element_blank(),
+        legend.position = c(0.89, 0.2))
+fig5
+ggsave(fig5, file = file.path(RESULTS, "fig5.pdf"), width = col2, height= col1, 
        units="cm")
 
 
@@ -331,50 +331,36 @@ traitb.coeftab <- xtable(traitb.coef, digits = 4)
 print(traitb.coeftab, type = "html", file = file.path(RESULTS, "trait-soil-coef.html"))
 
 ###############################################################################
-## Fig.7 plant traits-50 cm heating
+## Fig.6 plant traits-50 cm heating
 ###############################################################################
+fig6.fit <- flamdt %>% select(spcode, light, dengroup, fmcgroup, above.drym, 
+                              pre.fmc, bulkden, ave.sla, weatemp, above.drym_s, 
+                              pre.fmc_s, bulkden_s, ave.sla_s, weatemp_s) %>% 
+  filter(above.drym <= 40) %>% #the only ob had mass >40 is from first trial and excluded 
+  group_by(dengroup, fmcgroup) %>% 
+  arrange(above.drym_s) %>% filter(above.drym_s %in% range(above.drym_s))
 
-# Break bulkden into 2 groups: bulkden<0.0013, and bulkden>0.0013
+fig6.fit$heat50_log <- predict(trait50_mod, newdata = fig6.fit) #random effect considered
+fig6.fit <- fig6.fit %>% mutate(heat50 = 10^(heat50_log)) %>% 
+  select(-heat50_log, -above.drym_s, -pre.fmc_s, -bulkden_s, -ave.sla_s, -weatemp_s)
 
-## DWS: why is there this repeated code? all the heat data should be in a
-## single data frame. That is what your all_data.R script should be doing.
-flam50 <- flam50 %>% mutate(dengroup = cut(bulkden, c(-Inf, 0.0013, Inf),
-                                             labels =  c("Bulk~density < 0.0013~g~cm^{-3}", "Bulk~density > 0.0013~g~cm^{-3}")),
-                              fmcgroup = cut(pre.fmc, breaks=c(-Inf, 0.4, Inf),
-                                             labels = c("FMC < 40%", "FMC > 40%")))
-# Predict value for heat at 50cm from model
-predheat50 <- flam50 %>% select(label, spcode, light, block, ave.sla, pre.fmc, bulkden,
-                              above.drym, weatemp, above.drym_s, pre.fmc_s, ave.sla_s, 
-                              bulkden_s, weatemp_s, stgroup)
-predheat50$heat50_log <- predict(trait50_mod, newdata = predheat50)
-predheat50 <- predheat50 %>% mutate(heat50 = exp(heat50_log)) %>% 
-  mutate(heat50 = round(heat50, 2))
-
-# Attach fmc and bulkden group to predict value
-fmc50 <- flam50 %>% group_by(spcode) %>% summarise(fmcgroup = fmcgroup[1]) 
-den50 <- flam50 %>% group_by(spcode) %>% summarise(dengroup = dengroup[1]) 
-predheat50 <- predheat50 %>% left_join(fmc50, by = "spcode") %>% 
-  left_join(den50, by = "spcode")
-
-fig7 <- ggplot(flam50, aes(above.drym, heat50, color = dengroup)) + 
-  geom_point(size = ptsize)+
-  geom_smooth(data = predheat50, method = "lm", se=FALSE, size = 0.8, color = "black") +
-  facet_grid(. ~ fmcgroup) +
-  scale_y_continuous(trans = "log",  # log10!
-                     breaks = y50_breaks,
-                     labels = trans_format("log", math_format(e^.x)))+
-  xlab("Aboveground biomass (g)") + 
-  ylab("Heat release at 50cm (J)") +
-  scale_color_manual(values = schwilkcolors[c(1, 3)], labels=parse_format() ) +
+fig6 <- ggplot(flamdt, aes(above.drym, heat50, color = dengroup)) + 
+  geom_point(size = ptsize, alpha = 0.8) + 
+  facet_grid(.~fmcgroup) +
+  geom_line(aes(above.drym, heat50, color = dengroup), fig6.fit, size = 0.8) +
+  scale_color_manual(values = schwilkcolors[c(3, 1)], labels=parse_format()) + 
+  scale_y_continuous("Heat release at 50cm (J)",
+                     trans = "log10") +
+  xlab("Aboveground biomass (g)") +
+  scale_x_continuous(limits=c(0,40)) +
   guides(color = guide_legend(label.theme = element_text(family=fontfamily, 
-                                                         size=smsize,face = "plain"))) + 
-  pubtheme.nogridlines +
+                                                         size=smsize,face = "plain"))) +
+  pubtheme.nogridlines + 
   theme(legend.title = element_blank(),
-        legend.position = c(0.35, 0.2),
-        legend.background = element_rect(color="black"))
-
-fig7
-ggsave(file = file.path(RESULTS, "fig7.pdf"), width = col2, height= col1, 
+        legend.position = c(0.35, 0.15))
+        #legend.background = element_rect(color="black"))
+fig6
+ggsave(file = file.path(RESULTS, "fig6.pdf"), width = col2, height= col1, 
        units="cm")  
 
 ###############################################################################
@@ -388,23 +374,30 @@ trait50.coeftab <- xtable(trait50.coef, digits = 4)
 print(trait50.coeftab, type = "html", file = file.path(RESULTS, "trait-50-coef.html"))
 
 ###############################################################################
-## Fig. 8: plant traits, light environments, and live fuel moisture
+## Fig. 7: plant traits, light environments, and live fuel moisture
 ###############################################################################
 
-fmc.mean <- fmcdt %>% group_by(spcode, short.name, light) %>% 
-  summarise(pre.fmc = mean(pre.fmc), ldratio = mean(ldratio))
-fmc.mean <- left_join(fmc.mean, spst, by = "spcode")
+#fmc.mean <- fmcdt %>% group_by(spcode, short.name, light) %>% 
+  #summarise(pre.fmc = mean(pre.fmc), ldratio = mean(ldratio))
 
-fig8 <- ggplot(fmcdt, aes(ldratio, pre.fmc)) +
-  geom_point(size = ptsize) +
-  facet_grid(.~light,labeller = labeller(light = lightlable)) + 
-  geom_smooth(data = fmc.mean, method = "lm", se = FALSE, color = "black", size = 0.8)+
+fig7.fit <- fmcdt %>% select(spcode, light, ldratio, ave.sla, ave.sla_s) %>% 
+  filter(ldratio > 0) %>% 
+  group_by(light) %>% 
+  arrange(ldratio) %>% filter(ldratio %in% range(ldratio))
+  
+fig7.fit$pre.fmc <- predict(fmcmod, newdata = fig7.fit)
+
+fig7 <- ggplot(fmcdt, aes(ldratio, pre.fmc)) +
+  geom_point(size = ptsize, alpha = 0.5) +
+  facet_grid(.~light, labeller = labeller(light = lightlabel)) + 
+  geom_line(aes(ldratio, pre.fmc), fig7.fit, size = 0.8)+
   scale_y_continuous(labels = percent)+
   xlab("Live to dead mass ratio") + 
   ylab("Pre-burn fuel moisture content") +
   pubtheme.nogridlines 
 
-ggsave(fig8, file = file.path(RESULTS, "fig8.pdf"), width = col1, height= 0.7*col1, 
+fig7
+ggsave(fig7, file = file.path(RESULTS, "fig7.pdf"), width = col1, height= 0.7*col1, 
        units="cm") 
 
 ###############################################################################
