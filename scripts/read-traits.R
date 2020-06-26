@@ -290,6 +290,29 @@ trait.trial <- trait.trial %>% select(-pre.fmc2, -pre.fmc3, -above.drym2,
                                       -above.drym3, -combust.mass2, -combust.mass3,
                                       -bulkden2)
 
+###############################################################################
+## Read post-fire resprouting data
+###############################################################################
+
+catiller$label <- paste(catiller$spcode, catiller$light, catiller$block, sep="")
+catiller.open$label <- paste(catiller.open$spcode, catiller.open$light, 
+                             catiller.open$block, sep="")
+pre_tinum1 <- catiller %>%  group_by(label) %>% summarize(pre_tinum = tiller.num[1]) 
+
+pre_tinum2 <- catiller.open %>% group_by(label) %>% summarize(pre_tinum = tiller.num[1]) 
+
+pre_tinum <- rbind(pre_tinum1, pre_tinum2)
+
+
+post_traits <- read.csv("../data/post-fire-traits.csv", stringsAsFactors=FALSE,
+                        na.strings = c(""))
+#soilmc <- read.csv("../data/soil-moisture.csv", stringsAsFactors = FALSE, na.strings = c(""))
+
+post_traits$label <- paste(post_traits$spcode, post_traits$light, post_traits$block, 
+                           sep="")
+#soilmc$label <- paste(soilmc$spcode, soilmc$light, soilmc$block, 
+#sep="")
+
 ## clean env
 rm("case1", "case2", "case3", "sum1", "sum2", "sum3", "sum4", "nleaf_sum",
    "wleaf_sum", "grasstraits", "vol.sum",
