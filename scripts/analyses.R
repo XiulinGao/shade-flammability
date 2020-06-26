@@ -115,37 +115,16 @@ fmcaov
 
 ## former post-fire-traits.R
 ## determine how post-fire survival rate varied among species with 
-## different photosythetic pathway, shade tolerance and flammability (soil heating)
+## different shade tolerance, tiller, and flammability (soil heating)
 
-catiller$label <- paste(catiller$spcode, catiller$light, catiller$block, sep="")
-catiller.open$label <- paste(catiller.open$spcode, catiller.open$light, 
-                             catiller.open$block, sep="")
-pre_tinum1 <- catiller %>%  group_by(label) %>% summarize(pre_tinum = tiller.num[1]) 
-                                                                          
-pre_tinum2 <- catiller.open %>% group_by(label) %>% summarize(pre_tinum = tiller.num[1]) 
-                                                                               
-pre_tinum <- rbind(pre_tinum1, pre_tinum2)
-
-# DWS; Why is new data being read in? Put that in the read data scripts
-post_traits <- read.csv("../data/post-fire-traits.csv", stringsAsFactors=FALSE,
-                        na.strings = c(""))
-#soilmc <- read.csv("../data/soil-moisture.csv", stringsAsFactors = FALSE, na.strings = c(""))
-
-post_traits$label <- paste(post_traits$spcode, post_traits$light, post_traits$block, 
-                           sep="")
-#soilmc$label <- paste(soilmc$spcode, soilmc$light, soilmc$block, 
-                      #sep="")
+## post-fire survival dataset
 survi_dt <- post_traits %>% #left_join(soilmc, by = c("spcode", "light", "block", "label")) %>% 
   left_join(flamdt, by = c("spcode", "light", "block", "label")) %>% left_join(pre_tinum,
-                                                                 by = "label") %>% 
+                                                                               by = "label") %>% 
   select("spcode", "light", "block", "label",  "heatb", "phototype", "st", "above.drym",
          "curate", "pre_tinum", "tiller.num",  "max.leaflen", "tmass.dry", "survival") 
 
 colnames(survi_dt)[which(colnames(survi_dt)=="tiller.num")] <- "post_tinum"
-
-### H: shade intolerant grasses and C4 grasses are better fire-adapted (higher survival rate###
-###Grasses produce less heat at soil surface during fire also have higher survival ratee ###
-
 #rescale varibales
 survi_dt <- survi_dt %>% mutate_at(c('pre_tinum', 'heatb', 'st', 'above.drym'), 
                                    list(s = zscore))
