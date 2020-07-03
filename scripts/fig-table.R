@@ -44,7 +44,7 @@ names(spmean) <- str_replace(names(spmean), "_mean", "")
 ###############################################################################
 ## Table S1: Species means 
 ###############################################################################
-spmean_tab <- xtable(spmean)
+spmean_tab <- xtable(spmean, digits = 4)
 print(spmean_tab, type = "html", 
       file=file.path(RESULTS, "va_mean.html"), include.rownames=FALSE)
 
@@ -256,9 +256,10 @@ fig4 <- sjPlot::plot_model(resp_lmmod, type="pred",
                    colors = schwilkcolors,
                    legend.title = "Standardized\ntiller number", ci.lvl = NA)+
   pubtheme.nogridlines +
-  scale_y_continuous(labels = math_format(e^.x))+
+  scale_y_continuous("Predicted relative mass recovery",
+                     label = math_format(10^.x))+
   xlab("Standardized heat release at soil surface") + 
-  ylab("Predicted post-fire biomass recovery (%)") +
+  #ylab("Predicted biomass recovery (%)") +
   pubtheme.nogridlines + theme(plot.title = element_blank(),
                                legend.position = "right") +
   theme(legend.position = c(0.2, 0.32))
