@@ -4,14 +4,14 @@ Shade-Flammability
 Project goals
 -------------
 
-- Determine the relationship between shade tolerance and flammability in 17 grass species.
-- Examine how species variations in fuel moisture content, phenology, leaf and culm traits, and canopy architecture traits will cause differences in flammability.
-- Determine how different grass species response to fire + aboveground biomass clipping.
+- Determine if species with increased shade tolerance are less flammable 
+- Examine how species variations in fuel moisture content, phenology, leaf traits, and canopy architecture will influence flammability
+- Determine how plant traits and fire behavior influence post-fire plant response
 
 Methods
 ---------
 
-We grew plants in greenhouse from seeds (requested from USDA or bought from the nature's seed company), and applied 2 different light level treatments: 0% shade and 50% shade. For each light treatment we have 5 reps per species and these are located in 5 different blocks. Each block is evenly split into 0% and 50% light treatment. Within each pot we had 2 seedlings planted because that we used one for aboveground biomass measurement 4 months after treatment and the one for burning experiments 1 year after treatment.
+We grew 17 grass species in greenhouse from seeds (requested from USDA or bought from the nature's seed company), and applied 2 different light level treatments: 0% shade and 50% shade. For each light treatment we had 5 reps per species, and those were located in 5 blocks (split block design) with each block being evenly split into 0% and 50% light treatment. Within each pot we had 2 seedlings planted because we used one for aboveground biomass measurement 4 months after treatment and the other for burning experiments 1 year after treatment.
 
 See table 1 for plant trait measurements and table 2 for flammability measurements.
 
@@ -25,8 +25,6 @@ See table 1 for plant trait measurements and table 2 for flammability measuremen
 | Tiller number                                   | yes          | no               |
 | Tiller thickness                                | yes          | no               |
 | Biomass density                                 | yes          | no               |
-| Biomass height ratio                            | predicted    | no               |
-| Leaf to non-leaf mass ratio                     | yes          | no               |
 | Fuel moisture content                           | yes          | no               |
 | Live mass to dead mass ratio (fresh mass basis) | yes          | no               |
 
@@ -70,3 +68,8 @@ Studied species information is stored in data/species-info.csv, currently the fi
 7. data/balance folder stores balance data for each plant that is used to calculate maximum biomass loss rate; data/hobo folder stores hobo data that is used to summarize flame temperature for each burning trial such as temperature integration above 100 celsius degree and heating duration when temp is above 100 Celsius degree.
 
 8. data/t-h folder stores ambient temperature and relative humidity that were measured every 5 minutes on the burning date.
+
+Data analysis and scripts
+-------------------------
+All data analysis were done in R with all scripts located in scripts/. To reproduce results, only need to run ./analysis.R for all model results. Task of each script is documented at the beginning of each script. 
+
