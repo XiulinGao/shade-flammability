@@ -37,17 +37,23 @@ biplot(fppca)
 fppca.loads <- as.data.frame(loadings(fppca))
 fppca.loads
 
-#PCA without imputation
+#PCA without imputation and test of dimensionality
 d2 <- d %>% filter(!is.na(lossrate)) %>% filter(!is.na(heat50)) %>% 
   filter(!is.na(combust.mass)) %>% 
   select(combustion, lossrate, combust.mass,      #remove all NAs
          heat50, heatb, ignition) 
 
-d2 <- prep(d2, scale = "uv", center = TRUE)
-fpca <- d2 %>% pca(nPcs = 6, method = "svd")
-summary(fpca)
-fpca.loads <- as.data.frame(loadings(fpca))
-fpca.loads
+#d2 <- prep(d2, scale = "uv", center = TRUE)
+#fpca <- d2 %>% pca(nPcs = 6, method = "svd")
+#summary(fpca)
+#fpca.loads <- as.data.frame(loadings(fpca))
+#fpca.loads
+
+#test of dimensionality
+dpca <- ade4::dudi.pca(d2, scannf = FALSE)
+dtest <- ade4::testdim(dpca)
+dtest$nb #number of axis to keep
+
 
 # 1st axis: base temp and combustbiomass, heatb and heat50; 2nd axis: combustion;
 # 3rd axis: lossrate
