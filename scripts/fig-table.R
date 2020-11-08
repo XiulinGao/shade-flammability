@@ -4,6 +4,7 @@
 source("./analyses.R")
 source("./ggplot-theme.R")
 library(patchwork)
+library(sjPlot)
 #ptshape <- c(0, 1, 2, 4, 5, 6, 7,8, 10, 12, 13, 14,15, 16, 17, 18, 20)
 ## col1 = 13.2
 ## col2 = 7  # This makes no sense! a 2 column figure needs to be at least 2x as wide as a 1 col figure. Check submission requirements.
@@ -57,6 +58,11 @@ names(lightlabel) <- c("fs", "s")
 
 heightlabel <- c("At soil surface", "At 50 cm height")
 names(heightlabel) <- c("b", "50")
+
+heatlabel <- c("Standardized heat release at soil surface")
+names(heatlabel) <- c("heatb_s")
+stlabel <- c("st_s")
+names(stlabel) <- c("Shade tolerance")
 
 
 # break shade tolerance into 3 groups. Xiulin wants orange to be "low" and that
@@ -124,7 +130,7 @@ ggsave(file.path(RESULTS, "fig2_approach1.pdf"), plot=fig2,
 ## get predictions of heat release for 2 data points (max. and min. of 
 ## standardized biomass) for each stgroup and light using mixed effect model
 
-fig2.fit <- flamdt %>% select(spcode, light, above.drym_s, st_s, above.drym, st, stgroup) %>% 
+fig2.fit <- flamdt %>% select(spcode, phototype, light, above.drym_s, st_s, above.drym, st, stgroup) %>% 
   filter(above.drym <=40) %>% #try to match the range of x of the main layer 
   group_by(light, stgroup) %>% 
   arrange(above.drym_s) %>% filter(above.drym_s %in% range(above.drym_s))
@@ -142,7 +148,7 @@ fig2.fit <- fig2.fit %>% mutate(heat50 = 10^(heat50_log),
                       values_to = "heat" )
 
 fig2a <- ggplot(subset(fig2.flamdt, height=="50"), aes(above.drym, heat, color = stgroup)) +
-  geom_point(size = ptsize) + 
+  geom_point(size = ptsize, shape = 16) + 
   facet_grid(.~light, labeller = labeller(light = lightlabel)) + #scales = "free_x") +
   geom_line(aes(above.drym, heat, color = stgroup), subset(fig2.fit, height == "50"),
             size = 0.8) +
@@ -161,7 +167,7 @@ fig2a <- ggplot(subset(fig2.flamdt, height=="50"), aes(above.drym, heat, color =
 fig2a
 
 fig2b <- ggplot(subset(fig2.flamdt, height=="b"), aes(above.drym, heat, color = stgroup)) +
-  geom_point(size = ptsize) + 
+  geom_point(size = ptsize, shape = 16) + 
   geom_line(aes(above.drym, heat, color = stgroup), subset(fig2.fit, height =="b"), size = 0.8)+
   #geom_point(data = subset(fig2.spmean, height=="b"), size = ptsize) + 
   #geom_smooth(data = subset(fig2.spmean, height=="b"), method = "lm", se=FALSE, size = 0.8, color = "black") +
@@ -170,7 +176,7 @@ fig2b <- ggplot(subset(fig2.flamdt, height=="b"), aes(above.drym, heat, color = 
   #geom_errorbarh(aes(xmin=above.drym-above.drym_sd, xmax=above.drym+above.drym_sd), 
   #position = "identity", linetype = 1) + 
   scale_color_manual(values = shade_factor_colors) +
-  scale_y_continuous("Heat release at soil surface (J)",
+  scale_y_continuous("Heat release at 0cm (J)",
                      trans = "log10") +
 #                     breaks = y0_breaks,
                      #labels = label_number()) +
@@ -187,14 +193,14 @@ fig2b
 
 fig2_approach2 <- fig2a + fig2b +
 plot_layout(ncol = 1) +
-  plot_annotation(tag_levels = 'A') &
+  plot_annotation(tag_levels = 'a') &
   theme(plot.margin = unit(c(4, 4, 4, 4), "pt"),
         plot.tag.position = c(0, 1),
-        plot.tag = element_text(hjust = -0.5, vjust = 0.3))
+        plot.tag = element_text(hjust = -0.5, vjust = 0.35))
 
 fig2_approach2
-ggsave(file.path(RESULTS, "fig2_approach2.pdf"), plot=fig2_approach2,
-       width=col2, height=col1*2, unit="cm")
+ggsave(file.path(RESULTS, "fig2_approach2.jpeg"), plot=fig2_approach2,
+       width=col2, height=0.7*col2, dpi = 600, unit="cm")
 
 ###############################################################################
 ## Table S2: mixed effect model coefficient and anova table
@@ -222,20 +228,12 @@ print(tab150.coef, type = "html", file = file.path(RESULTS, "50-st-coef.html"))
 ## Fig. 3: Predicted post-fire survival rate 
 ###############################################################################
 
-fig3 <- sjPlot::plot_model(survi_mod, type="pred", terms = c("heatb_s [all]"), 
-                           ci.lvl = NA)+
-  pubtheme.nogridlines +
-  #guides(color = guide_legend(title.position = "bottom",
-    #label.theme = element_text(family=fontfamily, 
-                    #size=smsize,face = "plain"))) + 
-  pubtheme.nogridlines + theme(plot.title = element_blank()) +
-                               #legend.title = element_blank(),
-                               #legend.position = "right") +
-  xlab("Standardized heat release at soil surface") + 
-  ylab("Predicted survival rate")
+set_theme (pubtheme.nogridlines,
+           legend.pos = "right") #set default theme for sjPlot
+fig3 <- plot_model(survi_mod, type ="int", mdrt.values = "meansd",
+                           colors = schwilkcolors) 
 fig3
-
-ggsave(fig3, file = file.path(RESULTS, "fig3.pdf"), width = col1 , height= 0.7*col1, 
+ggsave(fig3, file = file.path(RESULTS, "fig3.pdf"), width = col2 , height= 0.7*col2, 
        units="cm")
 
 ###############################################################################
@@ -251,18 +249,17 @@ tab2survi.coef <- xtable(survi.coef, digits = 4)
 # Fig. 4: Predicted post-fire percentage biomass recovery
 ###############################################################################
 
-fig4 <- sjPlot::plot_model(resp_lmmod, type="pred",
-                   terms = c("heatb_s", "pre_tinum_s"),
-                   colors = schwilkcolors,
-                   legend.title = "Standardized\ntiller number", ci.lvl = NA)+
-  pubtheme.nogridlines +
-  scale_y_continuous("Predicted relative mass recovery",
+fig4 <- plot_model(resp_lmmod, type="pred",
+                   terms = c("heatb_s"),
+                   colors = schwilkcolors) +
+                   #legend.title = "Standardized\ntiller number", ci.lvl = NA)+
+  ylab("Predicted relative mass recovery",
                      label = math_format(10^.x))+
   xlab("Standardized heat release at soil surface") + 
   #ylab("Predicted biomass recovery (%)") +
-  pubtheme.nogridlines + theme(plot.title = element_blank(),
-                               legend.position = "right") +
-  theme(legend.position = c(0.2, 0.32))
+  pubtheme.nogridlines + theme(plot.title = element_blank()) #,
+                               #legend.position = "right") +
+  #theme(legend.position = c(0.2, 0.32))
 fig4
 ggsave(fig4, file = file.path(RESULTS, "fig4.pdf"), width = col1, height= 0.7*col1,
        units="cm")
@@ -304,21 +301,27 @@ fig5.fit <- fig5.fit %>% mutate(heatb = 10^(heatb_log)) %>%
   select(-heatb_log, -above.drym_s, -pre.fmc_s, -bulkden_s, -ave.sla_s, -weatemp_s)
 
 fig5 <- ggplot(flamdt, aes(above.drym, heatb, color = fmcgroup)) + 
-  geom_point(size = ptsize, alpha = 0.8) + 
+  geom_point(size = 0.5*ptsize, alpha = 0.8, shape = 16) + 
   facet_grid(.~slagroup, labeller = label_parsed) +
-  geom_line(aes(above.drym, heatb, color = fmcgroup), fig5.fit, size = 0.8) +
+  geom_line(aes(above.drym, heatb, color = fmcgroup), fig5.fit, size = 0.4) +
   scale_color_manual(values = schwilkcolors[c(3, 1)]) + 
   scale_y_continuous("Heat release at soil surface (J)",
                      trans = "log10") +
   xlab("Aboveground biomass (g)") +
   pubtheme.nogridlines + 
   guides(color = guide_legend(label.theme = element_text(family=fontfamily, 
-                                                         size=smsize,face = "plain"))) +
-  theme(legend.title = element_blank(),
-        legend.position = c(0.89, 0.2))
+                                                         size= 0.5*smsize,face = "plain"))) +
+  theme(axis.title.y = element_text(size = 0.5*textsize),
+        axis.title.x = element_text(size = 0.5*textsize),
+        axis.text.y = element_text(size = 0.5*smsize),
+        axis.text.x = element_text(size = 0.5*smsize),
+        strip.text.x = element_text(family=fontfamily, size = 0.5*textsize),
+        panel.border = element_rect(size = 0.8),
+        legend.title = element_blank(),
+        legend.position = c(0.85, 0.2))
 fig5
-ggsave(fig5, file = file.path(RESULTS, "fig5.pdf"), width = col2, height= col1, 
-       units="cm")
+ggsave(fig5, file = file.path(RESULTS, "fig5.jpeg"), width = col1, height= 0.7*col1, 
+      dpi = 600,  units="cm")
 
 
 ###############################################################################
@@ -346,23 +349,29 @@ fig6.fit <- fig6.fit %>% mutate(heat50 = 10^(heat50_log)) %>%
   select(-heat50_log, -above.drym_s, -pre.fmc_s, -bulkden_s, -ave.sla_s, -weatemp_s)
 
 fig6 <- ggplot(flamdt, aes(above.drym, heat50, color = dengroup)) + 
-  geom_point(size = ptsize, alpha = 0.8) + 
+  geom_point(size = 0.5*ptsize, alpha = 0.8, shape = 16) + 
   facet_grid(.~fmcgroup) +
-  geom_line(aes(above.drym, heat50, color = dengroup), fig6.fit, size = 0.8) +
+  geom_line(aes(above.drym, heat50, color = dengroup), fig6.fit, size = 0.4) +
   scale_color_manual(values = schwilkcolors[c(3, 1)], labels=parse_format()) + 
   scale_y_continuous("Heat release at 50cm (J)",
                      trans = "log10") +
   xlab("Aboveground biomass (g)") +
   scale_x_continuous(limits=c(0,40)) +
   guides(color = guide_legend(label.theme = element_text(family=fontfamily, 
-                                                         size=smsize,face = "plain"))) +
+                                                         size=0.5*smsize,face = "plain"))) +
   pubtheme.nogridlines + 
-  theme(legend.title = element_blank(),
-        legend.position = c(0.35, 0.15))
+  theme(axis.title.y = element_text(size = 0.5*textsize),
+        axis.title.x = element_text(size = 0.5*textsize),
+        axis.text.y = element_text(size = 0.5*smsize),
+        axis.text.x = element_text(size = 0.5*smsize),
+        strip.text.x = element_text(family=fontfamily, size = 0.5*textsize),
+        panel.border = element_rect(size = 0.8),
+        legend.title = element_blank(),
+        legend.position = "bottom")
         #legend.background = element_rect(color="black"))
 fig6
-ggsave(file = file.path(RESULTS, "fig6.pdf"), width = col2, height= col1, 
-       units="cm")  
+ggsave(file = file.path(RESULTS, "fig6.jpeg"), width = col1, height= 0.7*col1, 
+       units="cm", dpi = 600)  
 
 ###############################################################################
 ## Table S7: traits-50cm heating model coefficients and anova table
@@ -389,17 +398,23 @@ fig7.fit <- fmcdt %>% select(spcode, light, ldratio, ave.sla, ave.sla_s) %>%
 fig7.fit$pre.fmc <- predict(fmcmod, newdata = fig7.fit)
 
 fig7 <- ggplot(fmcdt, aes(ldratio, pre.fmc)) +
-  geom_point(size = ptsize, alpha = 0.5) +
+  geom_point(size = 0.5*ptsize, alpha = 0.5, shape = 16) +
   facet_grid(.~light, labeller = labeller(light = lightlabel)) + 
-  geom_line(aes(ldratio, pre.fmc), fig7.fit, size = 0.8)+
+  geom_line(aes(ldratio, pre.fmc), fig7.fit, size = 0.4)+
   scale_y_continuous(labels = percent)+
   xlab("Live to dead mass ratio") + 
   ylab("Pre-burn fuel moisture content") +
-  pubtheme.nogridlines 
+  pubtheme.nogridlines +
+  theme(axis.title.y = element_text(size = 0.5*textsize),
+        axis.title.x = element_text(size = 0.5*textsize),
+        axis.text.y = element_text(size = 0.5*smsize),
+        axis.text.x = element_text(size = 0.5*smsize),
+        strip.text.x = element_text(family=fontfamily, size = 0.5*textsize),
+        panel.border = element_rect(size = 0.8))
 
 fig7
-ggsave(fig7, file = file.path(RESULTS, "fig7.pdf"), width = col1, height= 0.7*col1, 
-       units="cm") 
+ggsave(fig7, file = file.path(RESULTS, "fig7.jpeg"), width = col1, height= 0.7*col1, 
+       units="cm", dpi = 600) 
 
 ###############################################################################
 ## Table S8: plant phenology, sla and light effects on live fuel moisture

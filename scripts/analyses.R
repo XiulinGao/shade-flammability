@@ -51,7 +51,8 @@ flamdt <- flamdt %>% mutate_at(c("st", "above.drym", "pre.fmc", "ave.sla", "bulk
 
 
 #shade tolerance and soil heating mod
-baseheat_mod <- lmer(heatb_log ~ above.drym_s*st_s*light + (1|spcode), 
+baseheat_mod <- lmer(heatb_log ~ above.drym_s*st_s*light*phototype -
+                       above.drym_s:st_s:light:phototype + (1|spcode), 
                        flamdt, REML=TRUE)
 #plot(baseheat_mod)
 summary(baseheat_mod)
@@ -60,7 +61,8 @@ baseanova
 
 #shade tolrance and heat50 mod
 
-heat50_mod <- lmer(heat50_log ~ above.drym_s*st_s*light + (1|spcode), 
+heat50_mod <- lmer(heat50_log ~ above.drym_s*st_s*light*phototype -
+                     above.drym_s:st_s:light:phototype + (1|spcode), 
                          flamdt, REML=TRUE)
 #plot(heat50_mod)
 summary(heat50_mod)
@@ -134,7 +136,8 @@ survi_dt <- survi_dt %>% mutate_at(c('pre_tinum', 'heatb', 'st', 'above.drym'),
 
 #survival rate logistic mod
 
-survi_mod <- glm(survival ~ heatb_s*pre_tinum_s*st_s, 
+survi_mod <- glm(survival ~ heatb_s*pre_tinum_s*st_s*phototype -
+                   heatb_s:pre_tinum_s:st_s:phototype, 
                   survi_dt, family = binomial)
 summary(survi_mod)
 survi.aov <- car::Anova(survi_mod, type = 3)
@@ -145,7 +148,8 @@ respdt <- filter(survi_dt, tmass.dry != 0) %>% # excluded individuals didn't res
   mutate(recover_pcnt = tmass.dry/above.drym) %>% 
   mutate(log_pcntm = log10(recover_pcnt)) #calculate percentage biomass recovered 
                                         # and do log transformation
-resp_lmmod <- lmer(log_pcntm ~ heatb_s*pre_tinum_s*st_s + (1|spcode),
+resp_lmmod <- lmer(log_pcntm ~ heatb_s*pre_tinum_s*st_s*phototype -
+                     heatb_s:pre_tinum_s:st_s:phototype + (1|spcode),
                     respdt, REML = TRUE)
 #plot(resp_lmmod) #check resid normality 
 summary(resp_lmmod)
