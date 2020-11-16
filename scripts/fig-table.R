@@ -59,12 +59,6 @@ names(lightlabel) <- c("fs", "s")
 heightlabel <- c("At soil surface", "At 50 cm height")
 names(heightlabel) <- c("b", "50")
 
-heatlabel <- c("Standardized heat release at soil surface")
-names(heatlabel) <- c("heatb_s")
-stlabel <- c("st_s")
-names(stlabel) <- c("Shade tolerance")
-
-
 # break shade tolerance into 3 groups. Xiulin wants orange to be "low" and that
 # makes sense for "shade tolerance", so we should make a specaial color set for
 # the shade tolerance factor.
@@ -162,7 +156,7 @@ fig2a <- ggplot(subset(fig2.flamdt, height=="50"), aes(above.drym, heat, color =
   guides(color = guide_legend(label.theme = element_text(family=fontfamily, 
                                                          size=smsize,face = "plain"))) +
   theme(legend.title = element_blank(),
-        #legend.position = c(0.89, 0.2),
+        legend.position = "none",
         axis.title.x = element_blank())
 fig2a
 
@@ -186,13 +180,13 @@ fig2b <- ggplot(subset(fig2.flamdt, height=="b"), aes(above.drym, heat, color = 
 #                                                         size=smsize,face = "plain")))+
   pubtheme.nogridlines +
 theme(legend.title = element_blank(),
-      strip.text.x=element_blank())
-  #      legend.position = c(0.89, 0.2))
+      strip.text.x=element_blank(),
+   legend.position = "right")
 fig2b
 
 
 fig2_approach2 <- fig2a + fig2b +
-plot_layout(ncol = 1) +
+plot_layout(ncol = 1, guides = "collect") +
   plot_annotation(tag_levels = 'a') &
   theme(plot.margin = unit(c(4, 4, 4, 4), "pt"),
         plot.tag.position = c(0, 1),
@@ -228,13 +222,41 @@ print(tab150.coef, type = "html", file = file.path(RESULTS, "50-st-coef.html"))
 ## Fig. 3: Predicted post-fire survival rate 
 ###############################################################################
 
-set_theme (pubtheme.nogridlines,
-           legend.pos = "right") #set default theme for sjPlot
-fig3 <- plot_model(survi_mod, type ="int", mdrt.values = "meansd",
-                           colors = schwilkcolors) 
+set_theme(pubtheme.nogridlines,
+          axis.title.color = "black",
+          axis.textcolor = "black") #set global plot theme for sjPlot function
+
+fig3a <- plot_model(survi_mod, type ="pred", terms = c("heatb_s [all]",
+                    "pre_tinum_s [meansd]", "st_s [meansd]", "phototype [C3]"),
+                   colors = schwilkcolors, 
+                   axis.title = c("", "Survival"), title = "C3") + 
+  theme(legend.position = "none",
+        title = element_text(size = smsize, color = "black"),
+        axis.text = element_text(size = smsize))
+fig3a
+
+fig3b <- plot_model(survi_mod, type ="pred", terms = c("heatb_s [all]",
+                   "pre_tinum_s [meansd]", "st_s [meansd]", "phototype [C4]"),
+                    colors = schwilkcolors, 
+                    axis.title = c("Standardized heat release at soil surface", "Survival"), 
+                   title = "C4", legend.title = "tiller num") +
+  theme(legend.position = "right",
+        legend.text = element_text(size = smsize),
+        title = element_text(size = smsize, color ="black"),
+        axis.text = element_text(size = smsize))
+fig3b
+
+fig3 <- fig3a + fig3b  +
+  plot_layout(ncol = 1, nrow = 2, guides = "collect") +
+  theme(plot.margin = unit(c(4, 4, 4, 4), "pt"),
+        plot.tag.position = c(0, 1),
+        plot.tag = element_text(hjust = -0.5, vjust = 0.35))
 fig3
-ggsave(fig3, file = file.path(RESULTS, "fig3.pdf"), width = col2 , height= 0.7*col2, 
-       units="cm")
+
+ggsave(fig3, file = file.path(RESULTS, "fig3.jpeg"), width = col2 , height= 0.7*col2, 
+       units="cm", dpi = 600)
+
+
 
 ###############################################################################
 ## Table S4: post fire survival rate model coefficients and anova table
@@ -251,18 +273,21 @@ tab2survi.coef <- xtable(survi.coef, digits = 4)
 
 fig4 <- plot_model(resp_lmmod, type="pred",
                    terms = c("heatb_s"),
-                   colors = schwilkcolors) +
-                   #legend.title = "Standardized\ntiller number", ci.lvl = NA)+
-  ylab("Predicted relative mass recovery",
-                     label = math_format(10^.x))+
-  xlab("Standardized heat release at soil surface") + 
-  #ylab("Predicted biomass recovery (%)") +
-  pubtheme.nogridlines + theme(plot.title = element_blank()) #,
-                               #legend.position = "right") +
-  #theme(legend.position = c(0.2, 0.32))
+                   colors = schwilkcolors, 
+                   axis.title = c("Standardized heat release at soil surface",
+                                  "Predicted mass recovery (%)")) +
+  geom_line(size = 0.4) +
+  theme(plot.title = element_blank(),
+        axis.title.y = element_text(size = 0.5*textsize),
+        axis.title.x = element_text(size = 0.5*textsize),
+        axis.text.y = element_text(size = 0.5*smsize),
+        axis.text.x = element_text(size = 0.5*smsize),
+        strip.text.x = element_text(family=fontfamily, size = 0.5*textsize),
+        panel.border = element_rect(size = 0.8)) 
+
 fig4
-ggsave(fig4, file = file.path(RESULTS, "fig4.pdf"), width = col1, height= 0.7*col1,
-       units="cm")
+ggsave(fig4, file = file.path(RESULTS, "fig4.jpeg"), width = col1, height= 0.7*col1,
+       units="cm", dpi = 600)
 
 ###############################################################################
 ## Table S5: post fire biomass recovery model coefficients and anova table
