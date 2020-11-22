@@ -59,6 +59,7 @@ names(lightlabel) <- c("fs", "s")
 heightlabel <- c("At soil surface", "At 50 cm height")
 names(heightlabel) <- c("b", "50")
 
+
 # break shade tolerance into 3 groups. Xiulin wants orange to be "low" and that
 # makes sense for "shade tolerance", so we should make a specaial color set for
 # the shade tolerance factor.
@@ -169,7 +170,8 @@ fig2b <- ggplot(subset(fig2.flamdt, height=="b"), aes(above.drym, heat, color = 
   #geom_abline(data = ref, aes(slope = slope, intercept = intcpt)) +
   #geom_errorbarh(aes(xmin=above.drym-above.drym_sd, xmax=above.drym+above.drym_sd), 
   #position = "identity", linetype = 1) + 
-  scale_color_manual(values = shade_factor_colors) +
+  scale_color_manual(values = shade_factor_colors)+
+                     #name = "Shade tolerance group") +
   scale_y_continuous("Heat release at 0cm (J)",
                      trans = "log10") +
 #                     breaks = y0_breaks,
@@ -182,8 +184,8 @@ fig2b <- ggplot(subset(fig2.flamdt, height=="b"), aes(above.drym, heat, color = 
 theme(legend.title = element_blank(),
       strip.text.x=element_blank(),
    legend.position = "right")
-fig2b
 
+fig2b
 
 fig2_approach2 <- fig2a + fig2b +
 plot_layout(ncol = 1, guides = "collect") +
@@ -227,19 +229,27 @@ set_theme(pubtheme.nogridlines,
           axis.textcolor = "black") #set global plot theme for sjPlot function
 
 fig3a <- plot_model(survi_mod, type ="pred", terms = c("heatb_s [all]",
-                    "pre_tinum_s [meansd]", "st_s [meansd]", "phototype [C3]"),
-                   colors = schwilkcolors, 
+                    "pre_tinum_s [meansd]", "Shade.tol [-1, 0, 1]", "phototype [C3]"),
+                    colors = schwilkcolors[3:1], auto.label = TRUE,
                    axis.title = c("", "Survival"), title = "C3") + 
+  scale_x_continuous(breaks = c(0, 2, 4),
+                     labels = c("0" = "488", "2" = "2044", "4"="3599"))+
+  #convert standardized values to raw observations
   theme(legend.position = "none",
         title = element_text(size = smsize, color = "black"),
         axis.text = element_text(size = smsize))
 fig3a
 
+
 fig3b <- plot_model(survi_mod, type ="pred", terms = c("heatb_s [all]",
-                   "pre_tinum_s [meansd]", "st_s [meansd]", "phototype [C4]"),
-                    colors = schwilkcolors, 
-                    axis.title = c("Standardized heat release at soil surface", "Survival"), 
-                   title = "C4", legend.title = "tiller num") +
+                   "pre_tinum_s [meansd]", "Shade.tol [-1, 0, 1]", "phototype [C4]"),
+                    axis.title = c("Heat release at soil surface (J)", "Survival"), 
+                   title = "C4", legend.title = "Tiller number", 
+                   colors = schwilkcolors[3:1]) +
+  scale_color_manual(labels = c("14", "63", "112"), values = schwilkcolors[3:1])+
+  scale_x_continuous(breaks = c(0, 2, 4),
+    labels = c("0" = "488", "2" = "2044", "4"="3599"))+
+  #convert standardized values to raw observations
   theme(legend.position = "right",
         legend.text = element_text(size = smsize),
         title = element_text(size = smsize, color ="black"),
@@ -273,9 +283,11 @@ tab2survi.coef <- xtable(survi.coef, digits = 4)
 
 fig4 <- plot_model(resp_lmmod, type="pred",
                    terms = c("heatb_s"),
-                   colors = schwilkcolors, 
-                   axis.title = c("Standardized heat release at soil surface",
+                   axis.title = c("Heat release at soil surface (J)",
                                   "Predicted mass recovery (%)")) +
+  scale_x_continuous(breaks = c(0, 2, 4, 6),
+                     labels = c("0" = "488", "2" = "2044", "4"="3599",
+                                "6" = "5154"))+
   geom_line(size = 0.4) +
   theme(plot.title = element_blank(),
         axis.title.y = element_text(size = 0.5*textsize),
@@ -392,7 +404,8 @@ fig6 <- ggplot(flamdt, aes(above.drym, heat50, color = dengroup)) +
         strip.text.x = element_text(family=fontfamily, size = 0.5*textsize),
         panel.border = element_rect(size = 0.8),
         legend.title = element_blank(),
-        legend.position = "bottom")
+        legend.position = "bottom", 
+        legend.margin = margin(t = -12))
         #legend.background = element_rect(color="black"))
 fig6
 ggsave(file = file.path(RESULTS, "fig6.jpeg"), width = col1, height= 0.7*col1, 
