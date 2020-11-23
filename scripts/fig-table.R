@@ -227,22 +227,27 @@ print(tab150.coef, type = "html", file = file.path(RESULTS, "50-st-coef.html"))
 set_theme(pubtheme.nogridlines,
           axis.title.color = "black",
           axis.textcolor = "black") #set global plot theme for sjPlot function
-
+#use the mean (+/-) one stand deviation for shade tolerance and tiller number
+# to show interaction effects. corresponding raw obs in shade tolerance are:
+# 0.22, 0.43, 0.63
 fig3a <- plot_model(survi_mod, type ="pred", terms = c("heatb_s [all]",
-                    "pre_tinum_s [meansd]", "Shade.tol [-1, 0, 1]", "phototype [C3]"),
+                    "pre_tinum_s [meansd]", "st_s [-1, 0, 1]", "phototype [C3]"),
                     colors = schwilkcolors[3:1], auto.label = TRUE,
                    axis.title = c("", "Survival"), title = "C3") + 
-  scale_x_continuous(breaks = c(0, 2, 4),
-                     labels = c("0" = "488", "2" = "2044", "4"="3599"))+
+                   scale_x_continuous(breaks = c(0, 2, 4),
+                   labels = c("0" = "488", "2" = "2044", "4"="3599"))+
   #convert standardized values to raw observations
   theme(legend.position = "none",
         title = element_text(size = smsize, color = "black"),
         axis.text = element_text(size = smsize))
+#rewrite the facet levels so I can use nice labels for shade tolerance
+levels(fig3a$data$facet) <- c("Shade.tol = 0.22", "Shade.tol = 0.43", 
+                              "Shade.tol = 0.63")
 fig3a
 
 
 fig3b <- plot_model(survi_mod, type ="pred", terms = c("heatb_s [all]",
-                   "pre_tinum_s [meansd]", "Shade.tol [-1, 0, 1]", "phototype [C4]"),
+                   "pre_tinum_s [meansd]", "st_s [-1, 0, 1]", "phototype [C4]"),
                     axis.title = c("Heat release at soil surface (J)", "Survival"), 
                    title = "C4", legend.title = "Tiller number", 
                    colors = schwilkcolors[3:1]) +
@@ -254,6 +259,9 @@ fig3b <- plot_model(survi_mod, type ="pred", terms = c("heatb_s [all]",
         legend.text = element_text(size = smsize),
         title = element_text(size = smsize, color ="black"),
         axis.text = element_text(size = smsize))
+
+levels(fig3b$data$facet) <- c("Shade.tol = 0.22", "Shade.tol = 0.43", 
+                              "Shade.tol = 0.63")
 fig3b
 
 fig3 <- fig3a + fig3b  +

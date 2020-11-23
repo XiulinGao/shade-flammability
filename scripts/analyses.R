@@ -130,19 +130,14 @@ colnames(survi_dt)[which(colnames(survi_dt)=="tiller.num")] <- "post_tinum"
 #rescale varibales
 survi_dt <- survi_dt %>% mutate_at(c('pre_tinum', 'heatb', 'st', 'above.drym'), 
                                    list(s = zscore)) 
-#rename scaled variable in order to use a nice variable name in sjPlot
-colnames(survi_dt)[colnames(survi_dt)=="st_s"] <- "Shade.tol"
-#label Shad.t to make nice facet label when using sjPlot
-survi_dt <- survi_dt %>% 
-  sjlabelled::set_labels(Shade.tol, labels = c('Shade.tol' = 0))
 
 ##model survival and resprouting strength separately using logistic and liner
 ## mixed effect model
 
 #survival rate logistic mod
 
-survi_mod <- glm(survival ~ heatb_s*pre_tinum_s*Shade.tol*phototype -
-                   heatb_s:pre_tinum_s:Shade.tol:phototype, 
+survi_mod <- glm(survival ~ heatb_s*pre_tinum_s*st_s*phototype -
+                   heatb_s:pre_tinum_s:st_s:phototype, 
                   survi_dt, family = binomial)
 summary(survi_mod)
 survi.aov <- car::Anova(survi_mod, type = 3)
@@ -153,8 +148,8 @@ respdt <- filter(survi_dt, tmass.dry != 0) %>% # excluded individuals didn't res
   mutate(recover_pcnt = tmass.dry/above.drym) %>% 
   mutate(log_pcntm = log10(recover_pcnt)) #calculate percentage biomass recovered 
                                         # and do log transformation
-resp_lmmod <- lmer(log_pcntm ~ heatb_s*pre_tinum_s*Shade.tol*phototype -
-                     heatb_s:pre_tinum_s:Shade.tol:phototype + (1|spcode),
+resp_lmmod <- lmer(log_pcntm ~ heatb_s*pre_tinum_s*st_s*phototype -
+                     heatb_s:pre_tinum_s:st_s:phototype + (1|spcode),
                     respdt, REML = TRUE)
 #plot(resp_lmmod) #check resid normality 
 summary(resp_lmmod)
