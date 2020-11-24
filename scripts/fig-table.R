@@ -289,13 +289,13 @@ tab2survi.coef <- xtable(survi.coef, digits = 4)
 # Fig. 4: Predicted post-fire percentage biomass recovery
 ###############################################################################
 
-fig4 <- plot_model(resp_lmmod, type="pred",
-                   terms = c("heatb_s"),
+fig4 <- plot_model(resp_lmmod, type="pred", 
+                   terms = c("heatb_s [all]"), 
                    axis.title = c("Heat release at soil surface (J)",
-                                  "Predicted mass recovery (%)")) +
-  scale_x_continuous(breaks = c(0, 2, 4, 6),
-                     labels = c("0" = "488", "2" = "2044", "4"="3599",
-                                "6" = "5154"))+
+                                  "Predicted relative mass recovery")) +
+  scale_x_continuous(breaks = c(0, 2, 4),
+                     labels = c("0" = "488", "2" = "2044", "4"="3599"))+
+  scale_y_continuous(labels = math_format(10^.x))+
   geom_line(size = 0.4) +
   theme(plot.title = element_blank(),
         axis.title.y = element_text(size = 0.5*textsize),
@@ -306,6 +306,7 @@ fig4 <- plot_model(resp_lmmod, type="pred",
         panel.border = element_rect(size = 0.8)) 
 
 fig4
+
 ggsave(fig4, file = file.path(RESULTS, "fig4.jpeg"), width = col1, height= 0.7*col1,
        units="cm", dpi = 600)
 
