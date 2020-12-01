@@ -257,7 +257,7 @@ fig3b <- plot_model(survi_mod, type ="pred", terms = c("heatb_s [all]",
   #convert standardized values to raw observations
   theme(legend.position = "right",
         legend.text = element_text(size = smsize),
-        title = element_text(size = smsize, color ="black"),
+        title = element_text(size = smsize),
         axis.text = element_text(size = smsize))
 
 levels(fig3b$data$facet) <- c("Shade.tol = 0.22", "Shade.tol = 0.43", 

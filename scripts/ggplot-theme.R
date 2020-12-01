@@ -17,7 +17,8 @@ textsize <- 10
 smsize <- textsize-2
 pt2mm <- 0.35146
 smsize.mm <- smsize*pt2mm
-fontfamily = "ArialMT"
+#fontfamily = "ArialMT"
+fontfamily = "Times New Roman"
 col2 <- 15.2 # cm
 col1 <- 7.6 # cm #according to https://esajournals.onlinelibrary.wiley.com/hub/journal/19399170/resources/author-guidelines-ecy#Manuscript_Format
 
