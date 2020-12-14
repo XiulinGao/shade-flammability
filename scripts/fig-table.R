@@ -8,7 +8,7 @@ library(sjPlot)
 #ptshape <- c(0, 1, 2, 4, 5, 6, 7,8, 10, 12, 13, 14,15, 16, 17, 18, 20)
 ## col1 = 13.2
 ## col2 = 7  # This makes no sense! a 2 column figure needs to be at least 2x as wide as a 1 col figure. Check submission requirements.
-ptsize = 3.5
+ptsize = 3
 
 # textsize <- 20
 # axissz <- textsize-2
@@ -143,7 +143,7 @@ fig2.fit <- fig2.fit %>% mutate(heat50 = 10^(heat50_log),
                       values_to = "heat" )
 
 fig2a <- ggplot(subset(fig2.flamdt, height=="50"), aes(above.drym, heat, color = stgroup)) +
-  geom_point(size = ptsize, shape = 16) + 
+  geom_point(size = ptsize, shape = 16, alpha = 0.8) + 
   facet_grid(.~light, labeller = labeller(light = lightlabel)) + #scales = "free_x") +
   geom_line(aes(above.drym, heat, color = stgroup), subset(fig2.fit, height == "50"),
             size = 0.8) +
@@ -162,7 +162,7 @@ fig2a <- ggplot(subset(fig2.flamdt, height=="50"), aes(above.drym, heat, color =
 fig2a
 
 fig2b <- ggplot(subset(fig2.flamdt, height=="b"), aes(above.drym, heat, color = stgroup)) +
-  geom_point(size = ptsize, shape = 16) + 
+  geom_point(size = ptsize, shape = 16, alpha = 0.8) + 
   geom_line(aes(above.drym, heat, color = stgroup), subset(fig2.fit, height =="b"), size = 0.8)+
   #geom_point(data = subset(fig2.spmean, height=="b"), size = ptsize) + 
   #geom_smooth(data = subset(fig2.spmean, height=="b"), method = "lm", se=FALSE, size = 0.8, color = "black") +
@@ -241,8 +241,8 @@ fig3a <- plot_model(survi_mod, type ="pred", terms = c("heatb_s [all]",
         title = element_text(size = smsize, color = "black"),
         axis.text = element_text(size = smsize))
 #rewrite the facet levels so I can use nice labels for shade tolerance
-levels(fig3a$data$facet) <- c("Shade.tol = 0.22", "Shade.tol = 0.43", 
-                              "Shade.tol = 0.63")
+levels(fig3a$data$facet) <- c("Shade tol. = 0.22", "Shade tol. = 0.43", 
+                              "Shade tol. = 0.63")
 fig3a
 
 
@@ -260,8 +260,8 @@ fig3b <- plot_model(survi_mod, type ="pred", terms = c("heatb_s [all]",
         title = element_text(size = smsize),
         axis.text = element_text(size = smsize))
 
-levels(fig3b$data$facet) <- c("Shade.tol = 0.22", "Shade.tol = 0.43", 
-                              "Shade.tol = 0.63")
+levels(fig3b$data$facet) <- c("Shade tol. = 0.22", "Shade tol. = 0.43", 
+                              "Shade tol. = 0.63")
 fig3b
 
 fig3 <- fig3a + fig3b  +
