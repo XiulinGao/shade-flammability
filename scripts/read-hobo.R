@@ -86,7 +86,7 @@ tempsec.sum <- thermocouples.long %>% group_by(label, location) %>%
             degsec.100 = sum(temperature[temperature > threshold.b]),
             peak.temp = max(temperature, na.rm=TRUE),
             peak.time = time[which(peak.temp == temperature)[1]],
-            num.NA = sum(is.na(temperature)))
+            num.NA = sum(is.na(temperature))) %>% ungroup()
 
 ## plot out temp summary to see how species burned in terms of flame temp
 

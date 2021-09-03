@@ -168,3 +168,4 @@ resp.aov
 #clean env
 
 rm("pre_tinum1", "pre_tinum2", "pre_tinum", "post_traits")
+

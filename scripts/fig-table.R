@@ -120,6 +120,7 @@ fig2 <- ggplot(fig2.flamdt, aes(above.drym, heat, color = stgroup)) +
 fig2
 ggsave(file.path(RESULTS, "fig2_approach1.pdf"), plot=fig2,
        width=col2, height=col1*2, unit="cm")
+
 ## Approach 2 using patchwork
 
 ## get predictions of heat release for 2 data points (max. and min. of 
@@ -170,20 +171,18 @@ fig2b <- ggplot(subset(fig2.flamdt, height=="b"), aes(above.drym, heat, color = 
   #geom_abline(data = ref, aes(slope = slope, intercept = intcpt)) +
   #geom_errorbarh(aes(xmin=above.drym-above.drym_sd, xmax=above.drym+above.drym_sd), 
   #position = "identity", linetype = 1) + 
-  scale_color_manual(values = shade_factor_colors)+
-                     #name = "Shade tolerance group") +
+  scale_color_manual(values = shade_factor_colors, name = "Shade tolerance") +
   scale_y_continuous("Heat release at 0cm (J)",
                      trans = "log10") +
 #                     breaks = y0_breaks,
                      #labels = label_number()) +
   #                     labels = trans_format("log", math_format(e^.x))) +
   scale_x_continuous("Aboveground biomass (g)", limits=c(0,40)) +
-#  guides(color = guide_legend(label.theme = element_text(family=fontfamily, 
-#                                                         size=smsize,face = "plain")))+
+guides(color = guide_legend(label.theme = element_text(family=fontfamily, 
+                                                        size=smsize,face = "plain")))+
   pubtheme.nogridlines +
-theme(legend.title = element_blank(),
-      strip.text.x=element_blank(),
-   legend.position = "right")
+theme(strip.text.x=element_blank(),
+      legend.position = "right")
 
 fig2b
 
@@ -322,7 +321,55 @@ tab2resp.coef <- xtable(resp.coef, digits = 4)
 print(tab2resp.coef, type = "html", file = file.path(RESULTS, "resprout-coef.html"))
 
 ###############################################################################
-## Fig. 5: plant traits-soil heating
+## Fig.5a plant traits-50 cm heating
+###############################################################################
+fig5a.fit <- flamdt %>% select(spcode, light, dengroup, fmcgroup, above.drym, 
+                               pre.fmc, bulkden, ave.sla, weatemp, above.drym_s, 
+                               pre.fmc_s, bulkden_s, ave.sla_s, weatemp_s) %>% 
+  filter(above.drym <= 40) %>% #the only ob had mass >40 is from first trial and excluded 
+  group_by(dengroup, fmcgroup) %>% 
+  arrange(above.drym_s) %>% filter(above.drym_s %in% range(above.drym_s))
+
+fig5a.fit$heat50_log <- predict(trait50_mod, newdata = fig5a.fit) #random effect considered
+fig5a.fit <- fig5a.fit %>% mutate(heat50 = 10^(heat50_log)) %>% 
+  select(-heat50_log, -above.drym_s, -pre.fmc_s, -bulkden_s, -ave.sla_s, -weatemp_s)
+
+fig5a <- ggplot(flamdt, aes(above.drym, heat50, color = fmcgroup)) + 
+  geom_point(size = ptsize, alpha = 0.8, shape = 16) + 
+  facet_grid(.~dengroup, labeller = label_parsed) +
+  geom_line(aes(above.drym, heat50, color = fmcgroup), fig5a.fit, size = 0.8) +
+  scale_color_manual(values = schwilkcolors[c(3, 1)]) + 
+  scale_y_continuous("Heat release at 50cm (J)",
+                     trans = "log10") +
+  xlab("Aboveground biomass (g)") +
+  guides(color = guide_legend(label.theme = element_text(family=fontfamily, 
+                                                         size=smsize,face = "plain"))) +
+  pubtheme.nogridlines + 
+  theme(axis.title.y = element_text(size = textsize),
+        axis.title.x = element_blank(),
+        axis.text.y = element_text(size = smsize),
+        axis.text.x = element_text(size = smsize),
+        strip.text.x = element_text(family=fontfamily, size = textsize),
+        #panel.border = element_rect(size = 0.8),
+        #legend.title = element_blank(),
+        legend.position = "none")
+#legend.margin = margin(t = -12))
+#legend.background = element_rect(color="black"))
+fig5a
+
+###############################################################################
+## Table S6: traits-50cm heating model coefficients and anova table
+###############################################################################
+
+trait50.aovtab <- xtable(trait50aov)
+print(trait50.aovtab, type = "html", file = file.path(RESULTS, "trait-50-aov.html"))
+trait50.coef <- summary(trait50_mod)$coefficients
+trait50.coeftab <- xtable(trait50.coef, digits = 4)
+print(trait50.coeftab, type = "html", file = file.path(RESULTS, "trait-50-coef.html"))
+
+
+###############################################################################
+## Fig. 5b: plant traits-soil heating
 ###############################################################################
 
 flamdt <- flamdt %>% mutate(slagroup = cut(ave.sla,
@@ -334,7 +381,7 @@ flamdt <- flamdt %>% mutate(slagroup = cut(ave.sla,
                                            labels =  c("Bulk~density < 0.0013~g~cm^{-3}", "Bulk~density > 0.0013~g~cm^{-3}"))
                             )
 # Predict value of soil heating from mixed effect model
-fig5.fit <- flamdt %>% select(spcode, light, slagroup, fmcgroup, above.drym, 
+fig5b.fit <- flamdt %>% select(spcode, light, slagroup, fmcgroup, above.drym, 
                               pre.fmc, bulkden, ave.sla, weatemp, above.drym_s, 
                               pre.fmc_s, bulkden_s, ave.sla_s, weatemp_s) %>% 
   group_by(slagroup, fmcgroup) %>% 
@@ -342,36 +389,44 @@ fig5.fit <- flamdt %>% select(spcode, light, slagroup, fmcgroup, above.drym,
   filter(spcode !="pava2") #within fmc<40% group ended up with two obs having the
                            # same biomass, selecte the one having higher fmc
 
-fig5.fit$heatb_log <- predict(traitsoil_mod, newdata = fig5.fit) #random effect considered
-fig5.fit <- fig5.fit %>% mutate(heatb = 10^(heatb_log)) %>% 
+fig5b.fit$heatb_log <- predict(traitsoil_mod, newdata = fig5b.fit) #random effect considered
+fig5b.fit <- fig5b.fit %>% mutate(heatb = 10^(heatb_log)) %>% 
   select(-heatb_log, -above.drym_s, -pre.fmc_s, -bulkden_s, -ave.sla_s, -weatemp_s)
 
-fig5 <- ggplot(flamdt, aes(above.drym, heatb, color = fmcgroup)) + 
-  geom_point(size = 0.5*ptsize, alpha = 0.8, shape = 16) + 
+fig5b <- ggplot(flamdt, aes(above.drym, heatb, color = fmcgroup)) + 
+  geom_point(size = ptsize, alpha = 0.8, shape = 16) + 
   facet_grid(.~slagroup, labeller = label_parsed) +
-  geom_line(aes(above.drym, heatb, color = fmcgroup), fig5.fit, size = 0.4) +
-  scale_color_manual(values = schwilkcolors[c(3, 1)]) + 
+  geom_line(aes(above.drym, heatb, color = fmcgroup), fig5b.fit, size = 0.8) +
+  scale_color_manual(values = schwilkcolors[c(3, 1)], name="Fuel moisture content") + 
   scale_y_continuous("Heat release at soil surface (J)",
                      trans = "log10") +
   xlab("Aboveground biomass (g)") +
   pubtheme.nogridlines + 
-  guides(color = guide_legend(label.theme = element_text(family=fontfamily, 
-                                                         size= 0.5*smsize,face = "plain"))) +
-  theme(axis.title.y = element_text(size = 0.5*textsize),
-        axis.title.x = element_text(size = 0.5*textsize),
-        axis.text.y = element_text(size = 0.5*smsize),
-        axis.text.x = element_text(size = 0.5*smsize),
-        strip.text.x = element_text(family=fontfamily, size = 0.5*textsize),
-        panel.border = element_rect(size = 0.8),
-        legend.title = element_blank(),
-        legend.position = c(0.85, 0.2))
-fig5
-ggsave(fig5, file = file.path(RESULTS, "fig5.jpeg"), width = col1, height= 0.7*col1, 
-      dpi = 600,  units="cm")
+  #guides(color = guide_legend(label.theme = element_text(family=fontfamily, 
+                                                         #size= 0.5*smsize,face = "plain"))) +
+  theme(
+        axis.title.y = element_text(size = textsize),
+        axis.title.x = element_text(size = textsize),
+        axis.text.y = element_text(size = smsize),
+        axis.text.x = element_text(size = smsize),
+        strip.text.x = element_text(family=fontfamily, size = textsize),
+        #panel.border = element_rect(size = 0.8),
+        legend.position = "right")
+fig5b
 
+fig5<- fig5a + fig5b +
+  plot_layout(ncol = 1, guides = "collect") +
+  plot_annotation(tag_levels = 'a') &
+  theme(plot.margin = unit(c(4, 4, 4, 4), "pt"),
+        plot.tag.position = c(0, 1),
+        plot.tag = element_text(hjust = -0.5, vjust = 0.35))
+fig5
+
+ggsave(file = file.path(RESULTS, "fig5.jpeg"), width = col2, height= 0.7*col2, 
+       units="cm", dpi = 600)  
 
 ###############################################################################
-## Table S6: traits-soil heating model coefficients and anova table
+## Table S7: traits-soil heating model coefficients and anova table
 ###############################################################################
 
 traitb.aovtab <- xtable(traitsoilaov)
@@ -380,74 +435,25 @@ traitb.coef <- summary(traitsoil_mod)$coefficients
 traitb.coeftab <- xtable(traitb.coef, digits = 4)
 print(traitb.coeftab, type = "html", file = file.path(RESULTS, "trait-soil-coef.html"))
 
-###############################################################################
-## Fig.6 plant traits-50 cm heating
-###############################################################################
-fig6.fit <- flamdt %>% select(spcode, light, dengroup, fmcgroup, above.drym, 
-                              pre.fmc, bulkden, ave.sla, weatemp, above.drym_s, 
-                              pre.fmc_s, bulkden_s, ave.sla_s, weatemp_s) %>% 
-  filter(above.drym <= 40) %>% #the only ob had mass >40 is from first trial and excluded 
-  group_by(dengroup, fmcgroup) %>% 
-  arrange(above.drym_s) %>% filter(above.drym_s %in% range(above.drym_s))
-
-fig6.fit$heat50_log <- predict(trait50_mod, newdata = fig6.fit) #random effect considered
-fig6.fit <- fig6.fit %>% mutate(heat50 = 10^(heat50_log)) %>% 
-  select(-heat50_log, -above.drym_s, -pre.fmc_s, -bulkden_s, -ave.sla_s, -weatemp_s)
-
-fig6 <- ggplot(flamdt, aes(above.drym, heat50, color = dengroup)) + 
-  geom_point(size = 0.5*ptsize, alpha = 0.8, shape = 16) + 
-  facet_grid(.~fmcgroup) +
-  geom_line(aes(above.drym, heat50, color = dengroup), fig6.fit, size = 0.4) +
-  scale_color_manual(values = schwilkcolors[c(3, 1)], labels=parse_format()) + 
-  scale_y_continuous("Heat release at 50cm (J)",
-                     trans = "log10") +
-  xlab("Aboveground biomass (g)") +
-  scale_x_continuous(limits=c(0,40)) +
-  guides(color = guide_legend(label.theme = element_text(family=fontfamily, 
-                                                         size=0.5*smsize,face = "plain"))) +
-  pubtheme.nogridlines + 
-  theme(axis.title.y = element_text(size = 0.5*textsize),
-        axis.title.x = element_text(size = 0.5*textsize),
-        axis.text.y = element_text(size = 0.5*smsize),
-        axis.text.x = element_text(size = 0.5*smsize),
-        strip.text.x = element_text(family=fontfamily, size = 0.5*textsize),
-        panel.border = element_rect(size = 0.8),
-        legend.title = element_blank(),
-        legend.position = "bottom", 
-        legend.margin = margin(t = -12))
-        #legend.background = element_rect(color="black"))
-fig6
-ggsave(file = file.path(RESULTS, "fig6.jpeg"), width = col1, height= 0.7*col1, 
-       units="cm", dpi = 600)  
 
 ###############################################################################
-## Table S7: traits-50cm heating model coefficients and anova table
-###############################################################################
-
-trait50.aovtab <- xtable(trait50aov)
-print(trait50.aovtab, type = "html", file = file.path(RESULTS, "trait-50-aov.html"))
-trait50.coef <- summary(trait50_mod)$coefficients
-trait50.coeftab <- xtable(trait50.coef, digits = 4)
-print(trait50.coeftab, type = "html", file = file.path(RESULTS, "trait-50-coef.html"))
-
-###############################################################################
-## Fig. 7: plant traits, light environments, and live fuel moisture
+## Fig. 6: plant traits, light environments, and live fuel moisture
 ###############################################################################
 
 #fmc.mean <- fmcdt %>% group_by(spcode, short.name, light) %>% 
   #summarise(pre.fmc = mean(pre.fmc), ldratio = mean(ldratio))
 
-fig7.fit <- fmcdt %>% select(spcode, light, ldratio, ave.sla, ave.sla_s) %>% 
+fig6.fit <- fmcdt %>% select(spcode, light, ldratio, ave.sla, ave.sla_s) %>% 
   filter(ldratio > 0) %>% 
   group_by(light) %>% 
   arrange(ldratio) %>% filter(ldratio %in% range(ldratio))
   
-fig7.fit$pre.fmc <- predict(fmcmod, newdata = fig7.fit)
+fig6.fit$pre.fmc <- predict(fmcmod, newdata = fig6.fit)
 
-fig7 <- ggplot(fmcdt, aes(ldratio, pre.fmc)) +
+fig6 <- ggplot(fmcdt, aes(ldratio, pre.fmc)) +
   geom_point(size = 0.5*ptsize, alpha = 0.5, shape = 16) +
   facet_grid(.~light, labeller = labeller(light = lightlabel)) + 
-  geom_line(aes(ldratio, pre.fmc), fig7.fit, size = 0.4)+
+  geom_line(aes(ldratio, pre.fmc), fig6.fit, size = 0.4)+
   scale_y_continuous(labels = percent)+
   xlab("Live to dead mass ratio") + 
   ylab("Pre-burn fuel moisture content") +
@@ -459,8 +465,8 @@ fig7 <- ggplot(fmcdt, aes(ldratio, pre.fmc)) +
         strip.text.x = element_text(family=fontfamily, size = 0.5*textsize),
         panel.border = element_rect(size = 0.8))
 
-fig7
-ggsave(fig7, file = file.path(RESULTS, "fig7.jpeg"), width = col1, height= 0.7*col1, 
+fig6
+ggsave(fig7, file = file.path(RESULTS, "fig6.jpeg"), width = col1, height= 0.7*col1, 
        units="cm", dpi = 600) 
 
 ###############################################################################

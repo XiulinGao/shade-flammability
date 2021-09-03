@@ -6,6 +6,7 @@
 ## 50% shade in comparison with plants growing under full sun light
 
 library(broom.mixed)
+require(data.table)
 library(xtable)
 
 ###############################################################################
@@ -48,7 +49,7 @@ massgain.sp <- gmass.wide %>% group_by(spcode) %>%
 massgain.sp$ave.gain <- round(massgain.sp$ave.gain, digits = 4)
 
 ## rank averaged percentage biomass gain for all species
-require(data.table)
+
 massgain.sp <- data.table(massgain.sp, key="ave.gain")
 
 ## attach species name
