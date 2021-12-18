@@ -6,9 +6,8 @@ source("./ggplot-theme.R")
 library(patchwork)
 library(sjPlot)
 #ptshape <- c(0, 1, 2, 4, 5, 6, 7,8, 10, 12, 13, 14,15, 16, 17, 18, 20)
-## col1 = 13.2
-## col2 = 7  # This makes no sense! a 2 column figure needs to be at least 2x as wide as a 1 col figure. Check submission requirements.
-ptsize = 3
+
+ptsize = 4
 
 # textsize <- 20
 # axissz <- textsize-2
@@ -78,9 +77,6 @@ flamdt <- flamdt %>% mutate(stgroup = cut(st_s,
 spst <- flamdt %>% group_by(spcode) %>% summarise(stgroup = stgroup[1]) 
 spmean <- left_join(spmean, spst)# , by = "spcode")
 
-
-## DWS: TODO the lines need to be from the mixed model.
-
 ## first pivot the data longer
 fig2.flamdt <- flamdt %>% select(spcode, short.name, light, stgroup, above.drym, heatb, heat50) %>%
   tidyr::pivot_longer(cols = starts_with("heat"),
@@ -119,7 +115,7 @@ fig2 <- ggplot(fig2.flamdt, aes(above.drym, heat, color = stgroup)) +
         legend.position = c(0.89, 0.2))
 fig2
 ggsave(file.path(RESULTS, "fig2_approach1.pdf"), plot=fig2,
-       width=col2, height=col1*2, unit="cm")
+       width=col1, height=0.8*col1, unit="px", dpi=300)
 
 ## Approach 2 using patchwork
 
@@ -145,21 +141,21 @@ fig2.fit <- fig2.fit %>% mutate(heat50 = 10^(heat50_log),
 
 fig2a <- ggplot(subset(fig2.flamdt, height=="50"), aes(above.drym, heat, color = stgroup)) +
   geom_point(size = ptsize, shape = 16, alpha = 0.8) + 
-  facet_grid(.~light, labeller = labeller(light = lightlabel)) + #scales = "free_x") +
   geom_line(aes(above.drym, heat, color = stgroup), subset(fig2.fit, height == "50"),
             size = 0.8) +
+  facet_grid(.~light, labeller = labeller(light = lightlabel)) + #scales = "free_x") +
   #geom_point(data = subset(fig2.spmean, height=="50"), size = ptsize) + 
   #geom_smooth(data = subset(fig2.spmean, height=="50"), method = "lm", se=FALSE, size = 0.8)  +
-  scale_color_manual(values = shade_factor_colors) + 
+  scale_color_manual(values = shade_factor_colors, name="Shade tolerance") + 
   scale_y_continuous("Heat release at 50cm (J)",
                      trans = "log10") +
   scale_x_continuous(limits=c(0,40)) +
   pubtheme.nogridlines + 
   guides(color = guide_legend(label.theme = element_text(family=fontfamily, 
                                                          size=smsize,face = "plain"))) +
-  theme(legend.title = element_blank(),
-        legend.position = "none",
-        axis.title.x = element_blank())
+  theme(
+    legend.position = "none",
+    axis.title.x = element_blank()) 
 fig2a
 
 fig2b <- ggplot(subset(fig2.flamdt, height=="b"), aes(above.drym, heat, color = stgroup)) +
@@ -182,7 +178,7 @@ guides(color = guide_legend(label.theme = element_text(family=fontfamily,
                                                         size=smsize,face = "plain")))+
   pubtheme.nogridlines +
 theme(strip.text.x=element_blank(),
-      legend.position = "right")
+      legend.position = "none")
 
 fig2b
 
@@ -191,11 +187,12 @@ plot_layout(ncol = 1, guides = "collect") +
   plot_annotation(tag_levels = 'a') &
   theme(plot.margin = unit(c(4, 4, 4, 4), "pt"),
         plot.tag.position = c(0, 1),
-        plot.tag = element_text(hjust = -0.5, vjust = 0.35))
+        plot.tag = element_text(hjust = -3, vjust = 0.4, size = smsize),
+        legend.position = "bottom")
 
 fig2_approach2
-ggsave(file.path(RESULTS, "fig2_approach2.jpeg"), plot=fig2_approach2,
-       width=col2, height=0.7*col2, dpi = 600, unit="cm")
+ggsave(file.path(RESULTS, "fig2_approach2.pdf"), plot=fig2_approach2,
+       width=col2, height=0.85*col2, dpi = 300, unit="px")
 
 ###############################################################################
 ## Table S2: mixed effect model coefficient and anova table
@@ -237,41 +234,46 @@ fig3a <- plot_model(survi_mod, type ="pred", terms = c("heatb_s [all]",
                    labels = c("0" = "488", "2" = "2044", "4"="3599"))+
   #convert standardized values to raw observations
   theme(legend.position = "none",
-        title = element_text(size = smsize, color = "black"),
-        axis.text = element_text(size = smsize))
+        title = element_text(size = smsize),
+        axis.text = element_text(size = smsize)) +
+  guides(colour = guide_legend("Tiller number"))
 #rewrite the facet levels so I can use nice labels for shade tolerance
 levels(fig3a$data$facet) <- c("Shade tol. = 0.22", "Shade tol. = 0.43", 
                               "Shade tol. = 0.63")
+levels(fig3a$data$group_col) <- c("14", "63","112")
 fig3a
 
-
+tiller.color <- schwilkcolors[3:1]
 fig3b <- plot_model(survi_mod, type ="pred", terms = c("heatb_s [all]",
                    "pre_tinum_s [meansd]", "st_s [-1, 0, 1]", "phototype [C4]"),
                     axis.title = c("Heat release at soil surface (J)", "Survival"), 
-                   title = "C4", legend.title = "Tiller number", 
-                   colors = schwilkcolors[3:1]) +
-  scale_color_manual(labels = c("14", "63", "112"), values = schwilkcolors[3:1])+
+                   title = "C4", legend.title = "Tiller number",
+                   colors = tiller.color) +
+  #scale_color_manual(labels = c("14", "63", "112"), values = tiller.color)+
   scale_x_continuous(breaks = c(0, 2, 4),
-    labels = c("0" = "488", "2" = "2044", "4"="3599"))+
-  #convert standardized values to raw observations
-  theme(legend.position = "right",
-        legend.text = element_text(size = smsize),
+    labels = c("0" = "488", "2" = "2044", "4"="3599")) +
+  theme(legend.position = "none",
+        #legend.text = element_text(size = smsize),
         title = element_text(size = smsize),
         axis.text = element_text(size = smsize))
-
+  #convert standardized values to raw observations
+  
 levels(fig3b$data$facet) <- c("Shade tol. = 0.22", "Shade tol. = 0.43", 
                               "Shade tol. = 0.63")
+levels(fig3b$data$group_col) <- c("14", "63","112")
 fig3b
 
 fig3 <- fig3a + fig3b  +
-  plot_layout(ncol = 1, nrow = 2, guides = "collect") +
-  theme(plot.margin = unit(c(4, 4, 4, 4), "pt"),
-        plot.tag.position = c(0, 1),
-        plot.tag = element_text(hjust = -0.5, vjust = 0.35))
+  plot_layout(ncol = 1, nrow = 2, guides = "collect") & theme(
+    plot.margin = unit(c(4, 4, 4, 4), "pt"),
+    plot.tag.position = c(0, 1),
+    plot.tag = element_text(hjust = -0.5, vjust = 0.35),
+    legend.title = element_text(face = "plain"),
+    legend.position = "bottom") 
 fig3
 
-ggsave(fig3, file = file.path(RESULTS, "fig3.jpeg"), width = col2 , height= 0.7*col2, 
-       units="cm", dpi = 600)
+ggsave(fig3, file = file.path(RESULTS, "fig3.pdf"), width = col2 , height= 0.85*col2, 
+       units="px", dpi = 300)
 
 
 
@@ -304,10 +306,11 @@ fig4 <- plot_model(resp_lmmod, type="pred",
         strip.text.x = element_text(family=fontfamily, size = 0.5*textsize),
         panel.border = element_rect(size = 0.8)) 
 
+
 fig4
 
-ggsave(fig4, file = file.path(RESULTS, "fig4.jpeg"), width = col1, height= 0.7*col1,
-       units="cm", dpi = 600)
+ggsave(fig4, file = file.path(RESULTS, "fig4.pdf"), width = col1, height= 0.85*col1,
+       units="px", dpi = 300)
 
 ###############################################################################
 ## Table S5: post fire biomass recovery model coefficients and anova table
@@ -323,6 +326,15 @@ print(tab2resp.coef, type = "html", file = file.path(RESULTS, "resprout-coef.htm
 ###############################################################################
 ## Fig.5a plant traits-50 cm heating
 ###############################################################################
+flamdt <- flamdt %>% mutate(slagroup = cut(ave.sla,
+                                           breaks = c(-Inf, 300, Inf),
+                                           labels =  c("SLA > 300~cm^2~g^{-1}",  "SLA < 300~cm^2~g^{-1}")),
+                            fmcgroup = cut(pre.fmc, breaks=c(-Inf, 0.4, Inf),
+                                           labels = c("FMC < 40%", "FMC > 40%")),
+                            dengroup = cut(bulkden, c(-Inf, 0.0013, Inf),
+                                           labels =  c("Bulk~density < 0.0013~g~cm^{-3}", "Bulk~density > 0.0013~g~cm^{-3}"))
+)
+
 fig5a.fit <- flamdt %>% select(spcode, light, dengroup, fmcgroup, above.drym, 
                                pre.fmc, bulkden, ave.sla, weatemp, above.drym_s, 
                                pre.fmc_s, bulkden_s, ave.sla_s, weatemp_s) %>% 
@@ -338,7 +350,7 @@ fig5a <- ggplot(flamdt, aes(above.drym, heat50, color = fmcgroup)) +
   geom_point(size = ptsize, alpha = 0.8, shape = 16) + 
   facet_grid(.~dengroup, labeller = label_parsed) +
   geom_line(aes(above.drym, heat50, color = fmcgroup), fig5a.fit, size = 0.8) +
-  scale_color_manual(values = schwilkcolors[c(3, 1)]) + 
+  scale_color_manual(values = schwilkcolors[c(3, 1)], name="Fuel moisture content") + 
   scale_y_continuous("Heat release at 50cm (J)",
                      trans = "log10") +
   xlab("Aboveground biomass (g)") +
@@ -352,7 +364,7 @@ fig5a <- ggplot(flamdt, aes(above.drym, heat50, color = fmcgroup)) +
         strip.text.x = element_text(family=fontfamily, size = textsize),
         #panel.border = element_rect(size = 0.8),
         #legend.title = element_blank(),
-        legend.position = "none")
+        legend.position = "bottom")
 #legend.margin = margin(t = -12))
 #legend.background = element_rect(color="black"))
 fig5a
@@ -372,14 +384,7 @@ print(trait50.coeftab, type = "html", file = file.path(RESULTS, "trait-50-coef.h
 ## Fig. 5b: plant traits-soil heating
 ###############################################################################
 
-flamdt <- flamdt %>% mutate(slagroup = cut(ave.sla,
-                                           breaks = c(-Inf, 300, Inf),
-                                           labels =  c("SLA > 300~cm^2~g^{-1}",  "SLA < 300~cm^2~g^{-1}")),
-                            fmcgroup = cut(pre.fmc, breaks=c(-Inf, 0.4, Inf),
-                                           labels = c("FMC < 40%", "FMC > 40%")),
-                            dengroup = cut(bulkden, c(-Inf, 0.0013, Inf),
-                                           labels =  c("Bulk~density < 0.0013~g~cm^{-3}", "Bulk~density > 0.0013~g~cm^{-3}"))
-                            )
+
 # Predict value of soil heating from mixed effect model
 fig5b.fit <- flamdt %>% select(spcode, light, slagroup, fmcgroup, above.drym, 
                               pre.fmc, bulkden, ave.sla, weatemp, above.drym_s, 
@@ -398,9 +403,11 @@ fig5b <- ggplot(flamdt, aes(above.drym, heatb, color = fmcgroup)) +
   facet_grid(.~slagroup, labeller = label_parsed) +
   geom_line(aes(above.drym, heatb, color = fmcgroup), fig5b.fit, size = 0.8) +
   scale_color_manual(values = schwilkcolors[c(3, 1)], name="Fuel moisture content") + 
-  scale_y_continuous("Heat release at soil surface (J)",
+  scale_y_continuous("Heat release at 0cm (J)",
                      trans = "log10") +
   xlab("Aboveground biomass (g)") +
+  guides(color = guide_legend(label.theme = element_text(family=fontfamily, 
+                                                         size=smsize,face = "plain"))) +
   pubtheme.nogridlines + 
   #guides(color = guide_legend(label.theme = element_text(family=fontfamily, 
                                                          #size= 0.5*smsize,face = "plain"))) +
@@ -411,7 +418,7 @@ fig5b <- ggplot(flamdt, aes(above.drym, heatb, color = fmcgroup)) +
         axis.text.x = element_text(size = smsize),
         strip.text.x = element_text(family=fontfamily, size = textsize),
         #panel.border = element_rect(size = 0.8),
-        legend.position = "right")
+        legend.position = "bottom")
 fig5b
 
 fig5<- fig5a + fig5b +
@@ -419,11 +426,12 @@ fig5<- fig5a + fig5b +
   plot_annotation(tag_levels = 'a') &
   theme(plot.margin = unit(c(4, 4, 4, 4), "pt"),
         plot.tag.position = c(0, 1),
-        plot.tag = element_text(hjust = -0.5, vjust = 0.35))
+        plot.tag = element_text(hjust = -3, vjust = 0.4),
+        legend.position = "bottom")
 fig5
 
-ggsave(file = file.path(RESULTS, "fig5.jpeg"), width = col2, height= 0.7*col2, 
-       units="cm", dpi = 600)  
+ggsave(file = file.path(RESULTS, "fig5.pdf"), width = col2, height= 0.85*col2, 
+       units="px", dpi = 300)  
 
 ###############################################################################
 ## Table S7: traits-soil heating model coefficients and anova table
@@ -466,8 +474,8 @@ fig6 <- ggplot(fmcdt, aes(ldratio, pre.fmc)) +
         panel.border = element_rect(size = 0.8))
 
 fig6
-ggsave(fig7, file = file.path(RESULTS, "fig6.jpeg"), width = col1, height= 0.7*col1, 
-       units="cm", dpi = 600) 
+ggsave(fig6, file = file.path(RESULTS, "fig6.pdf"), width = col1, height= 0.85*col1, 
+       units="px", dpi = 300) 
 
 ###############################################################################
 ## Table S8: plant phenology, sla and light effects on live fuel moisture
@@ -478,3 +486,41 @@ print(tab5.fmcaov, type = "html", file = file.path(RESULTS, "fmc-aov.html"))
 fmccoef <- summary(fmcmod)$coefficients
 tab5.fmccoef <- xtable(fmccoef, digits = 4)
 print(tab5.fmccoef, type = "html", file = file.path(RESULTS, "fmc-coef.html"))
+
+
+###############################################################################
+## Figure S4: plant phenology, phototype and light effects on live fuel moisture
+###############################################################################
+figs4a <- ggplot(fmcdt, aes(ldratio, pre.fmc, color=phototype)) +
+  geom_point(size = 0.5*ptsize, alpha = 0.5, shape = 16) +
+  facet_grid(.~light, labeller = labeller(light = lightlabel)) + 
+  scale_y_continuous(labels = percent)+
+  xlab("Live to dead mass ratio") + 
+  ylab("Pre-burn fuel moisture content") +
+  pubtheme.nogridlines +
+  theme(axis.title.y = element_text(size = 0.5*textsize),
+        axis.title.x = element_text(size = 0.5*textsize),
+        axis.text.y = element_text(size = 0.5*smsize),
+        axis.text.x = element_text(size = 0.5*smsize),
+        strip.text.x = element_text(family=fontfamily, size = 0.5*textsize),
+        panel.border = element_rect(size = 0.8))
+figs4a
+ggsave(figs4a, file = file.path(RESULTS, "figs4a.jpeg"), width = col1, height= 0.7*col1, 
+       units="cm", dpi = 600) 
+
+figs4b <- ggplot(fmcdt, aes(st, ldratio, color=phototype)) +
+  geom_point(size = 0.5*ptsize, alpha = 0.5, shape = 16) +
+  facet_grid(.~light, labeller = labeller(light = lightlabel)) + 
+  #scale_y_continuous(labels = percent)+
+  xlab("Shade tolerance") + 
+  ylab("Live to dead biomass ratio") +
+  pubtheme.nogridlines +
+  theme(axis.title.y = element_text(size = 0.5*textsize),
+        axis.title.x = element_text(size = 0.5*textsize),
+        axis.text.y = element_text(size = 0.5*smsize),
+        axis.text.x = element_text(size = 0.5*smsize),
+        strip.text.x = element_text(family=fontfamily, size = 0.5*textsize),
+        panel.border = element_rect(size = 0.8)) 
+figs4b
+ggsave(figs4b, file = file.path(RESULTS, "figs4c.jpeg"), width = col1, height= 0.7*col1, 
+       units="cm", dpi = 600) 

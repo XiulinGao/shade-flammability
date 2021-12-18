@@ -317,7 +317,7 @@ post_traits$label <- paste(post_traits$spcode, post_traits$light, post_traits$bl
 ## clean env
 rm("case1", "case2", "case3", "sum1", "sum2", "sum3", "sum4", "nleaf_sum",
    "wleaf_sum", "grasstraits", "vol.sum",
-   "leaftrait", "leaftrait.sum", "fmc.mratio", "nleaf", "wleaf")
+   "leaftrait", "fmc.mratio", "nleaf", "wleaf")
 
 
 

@@ -201,18 +201,27 @@ ggplot(flamNLModsCoef_sig, aes(spcode, estimate)) + geom_point()
 
 ## Approach 2: fit flamming stage balance data to linear model
 
-flamingLMods <- flam.bytrial %>% nest(data = -label) %>% 
-  mutate(
-    fit = map(data, ~ lm(decaym ~ decayt, data = .x)),
-                           tidied = map(fit, tidy)
-  ) %>% unnest(tidied)
+bytrial_nest <- flam.bytrial %>% ungroup() %>% 
+  select(label, decaym, decayt) %>% 
+  as_tibble()
+
+bytrial_nest <- bytrial_nest %>% 
+  nest(data = c("decaym", "decayt")) 
+
+flamingLMods_nest <- bytrial_nest %>% mutate(
+    fit = purrr::map(data, ~lm(decaym ~ decayt, data=.x)),
+    tidied = purrr::map(fit, tidy))
+
+flamingLMods <- flamingLMods_nest %>% 
+  select(label, tidied) %>% 
+  unnest(tidied)
 
 flamingLMcoef <- flamingLMods %>% filter(term=='decayt') %>% 
-  filter(estimate<0) %>% select(-data, -fit)
+  filter(estimate<0) 
 
 flamingLMcoef_sig <- flamingLMcoef %>%
   filter(p.value <0.05)
-laics <- sapply(flamingLMods$fit, AIC)
+laics <- sapply(flamingLMods_nest$fit, AIC)
 
 #flam.nlaics <- as.numeric(flam.nlaics)
 #flam.nlaics <- as.data.frame(flam.nlaics)
